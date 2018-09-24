@@ -2,6 +2,7 @@
 
 namespace DockerManagerBundle\Command;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class WebSocketServerCommand extends Command
 {
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
      * @var int
      */
     private $port;
@@ -22,12 +27,14 @@ class WebSocketServerCommand extends Command
 
     /**
      * WebSocketServerCommand constructor.
-     * @param int $port the port the server will listen to
+     * @param LoggerInterface $logger
+     * @param int $port
      */
-    public function __construct(int $port = 8000)
+    public function __construct(LoggerInterface $logger, int $port)
     {
-        $this->port = $port;
         parent::__construct();
+        $this->logger = $logger;
+        $this->port = $port;
     }
 
     protected function configure()
@@ -41,6 +48,7 @@ class WebSocketServerCommand extends Command
     {
         // TODO : create ratchet websocket server
         $output->writeln("Hello World");
+        $output->writeln("Port : " . $this->port);
     }
 
 }

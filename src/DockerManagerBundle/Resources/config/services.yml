@@ -1,4 +1,10 @@
 services:
-#    docker_manager.example:
-#        class: DockerManagerBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
+    # default configuration for services in *this* file
+    _defaults:
+      autowire: true
+      autoconfigure: true
+      public: false
+    docker_manager.websocket_server_command:
+        class: DockerManagerBundle\Command\WebSocketServerCommand
+        arguments: ["@logger", "%websocket_server_port%"]
+
