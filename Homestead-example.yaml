@@ -1,0 +1,20 @@
+ip: 192.168.10.11
+memory: 2048
+cpus: 1
+provider: virtualbox
+authorize: ~/.ssh/id_rsa.pub
+keys:
+    - ~/.ssh/id_rsa
+folders:
+    -
+        map: /home/etudiant/Dev/LIDE/LideProjectManager
+        to: /home/vagrant/code
+sites:
+    - map: lide-project.test
+      to: /home/vagrant/code/web
+      type: symfony2
+
+databases:
+    - homestead
+name: lideprojectmanager
+hostname: lideprojectmanager
