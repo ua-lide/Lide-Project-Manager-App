@@ -1,0 +1,4 @@
+services:
+#    docker_manager.example:
+#        class: DockerManagerBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -4,7 +4,8 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "AppBundle\\": "src/AppBundle"
+            "AppBundle\\": "src/AppBundle",
+            "DockerManagerBundle\\": "src/DockerManagerBundle"
         },
         "classmap": [
             "app/AppKernel.php",
@@ -21,6 +22,7 @@
     },
     "require": {
         "php": ">=5.5.9",
+        "cboden/ratchet": "^0.4.1",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/orm": "^2.5",
         "incenteev/composer-parameter-handler": "^2.0",

@@ -1,0 +1,3 @@
+docker_manager_homepage:
+    path:     /
+    defaults: { _controller: DockerManagerBundle:Default:index }
