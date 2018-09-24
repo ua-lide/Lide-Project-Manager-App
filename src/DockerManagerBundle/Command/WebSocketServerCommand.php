@@ -50,24 +50,20 @@ class WebSocketServerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO : create ratchet websocket server
-        $output->writeln("Hello World");
-        $output->writeln("Port : " . $this->port);
-
         $wsServer = new WebSocketServer($this->logger);
 
         $server = IoServer::factory(
-            new HttpServer(
-                new WsServer(
-                    $wsServer
-                )
-            ),
-            $this->port
+            $wsServer, //Need to wrap this into a WsServer into an HttpServer. I let it like this so i can test from terminal with telnet
+            $this->port,
+            "192.168.10.11"
         );
 
         $server->loop->addPeriodicTimer(1.0, function () use ($wsServer){
-            //
+            $wsServer->retrieveDockerOutput();
         });
+//
+        $output->writeln("Server running on port " . $this->port);
+        $server->run();
     }
 
 }

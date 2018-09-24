@@ -17,9 +17,15 @@ class WebSocketServer implements MessageComponentInterface
 {
 
     /**
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage|ConnectionInterface[]
      */
     protected $clients;
+
+    /**
+     * @var UserManager[]
+     */
+    protected $users;
+
     /**
      * @var LoggerInterface
      */
@@ -33,6 +39,7 @@ class WebSocketServer implements MessageComponentInterface
     {
         $this->clients = new \SplObjectStorage();
         $this->logger = $logger;
+        $this->users = [];
     }
 
 
@@ -44,6 +51,9 @@ class WebSocketServer implements MessageComponentInterface
     function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
+        $this->logger->info("New connection " . $conn->resourceId);
+        $this->users[$conn->resourceId] = new UserManager(); //TODO attach user entity
+        $conn->send("Connected");
     }
 
     /**
@@ -55,6 +65,7 @@ class WebSocketServer implements MessageComponentInterface
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
+        unset($this->users[$conn->resourceId]);
         $this->logger->info("Connection {$conn->resourceId} has disconnected\n");
     }
 
@@ -79,6 +90,14 @@ class WebSocketServer implements MessageComponentInterface
     function onMessage(ConnectionInterface $from, $msg)
     {
         // TODO: Implement onMessage() method.
+        echo "Received message from " . $from->resourceId . "\n";
         $from->send($msg); //Echo
+    }
+
+    public function retrieveDockerOutput(){
+        // Dummy method
+        foreach ($this->clients as $client) {
+            $client->send(date(DATE_ATOM) . "\n");
+        }
     }
 }
