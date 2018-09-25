@@ -4,9 +4,7 @@ namespace DockerManagerBundle\Command;
 
 use DockerManagerBundle\WebSocketServer\WebSocketServer;
 use Psr\Log\LoggerInterface;
-use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
-use Ratchet\WebSocket\WsServer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -58,11 +56,13 @@ class WebSocketServerCommand extends Command
             "192.168.10.11"
         );
 
-        $server->loop->addPeriodicTimer(1.0, function () use ($wsServer){
+        $server->loop->addPeriodicTimer(0.5, function () use ($wsServer){
             $wsServer->retrieveDockerOutput();
         });
+        $server->loop->addTimer(0.1, function () use ($output){
+            $output->writeln("Server running on port " . $this->port);
+        });
 //
-        $output->writeln("Server running on port " . $this->port);
         $server->run();
     }
 

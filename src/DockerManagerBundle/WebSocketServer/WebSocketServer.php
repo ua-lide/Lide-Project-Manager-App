@@ -51,8 +51,17 @@ class WebSocketServer implements MessageComponentInterface
     function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
+
+        /** @noinspection PhpUndefinedFieldInspection */
         $this->logger->info("New connection " . $conn->resourceId);
-        $this->users[$conn->resourceId] = new UserManager(); //TODO attach user entity
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        $userManager = new UserManager($conn); //TODO attach user entity
+        /** @noinspection PhpUndefinedFieldInspection */
+        $this->users[$conn->resourceId] = $userManager;
+
+        $userManager->startContainer();
+
         $conn->send("Connected");
     }
 
@@ -65,7 +74,10 @@ class WebSocketServer implements MessageComponentInterface
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
+        /** @noinspection PhpUndefinedFieldInspection */
         unset($this->users[$conn->resourceId]);
+
+        /** @noinspection PhpUndefinedFieldInspection */
         $this->logger->info("Connection {$conn->resourceId} has disconnected\n");
     }
 
@@ -90,14 +102,26 @@ class WebSocketServer implements MessageComponentInterface
     function onMessage(ConnectionInterface $from, $msg)
     {
         // TODO: Implement onMessage() method.
-        echo "Received message from " . $from->resourceId . "\n";
+        /** @noinspection PhpUndefinedFieldInspection */
         $from->send($msg); //Echo
     }
 
     public function retrieveDockerOutput(){
         // Dummy method
-        foreach ($this->clients as $client) {
-            $client->send(date(DATE_ATOM) . "\n");
+        foreach ($this->users as $user) {
+            echo "Top\n";
+            $out = $user->readOutput();
+
+            $response = [];
+
+            $response['stdout'] = $out;
+            $response['stderr'] = $user->readStderr();
+            $response['running'] = $user->isContainerRunning();
+
+            if(!empty($response['stdout']) || !empty($response['stderr'] && !$response['running'])){
+                $user->getConnection()->send(json_encode($response, JSON_PRETTY_PRINT));
+            }
+
         }
     }
 }
