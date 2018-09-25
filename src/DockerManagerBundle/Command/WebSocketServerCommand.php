@@ -62,7 +62,7 @@ class WebSocketServerCommand extends Command
         $server->loop->addTimer(0.1, function () use ($output){
             $output->writeln("Server running on port " . $this->port);
         });
-//
+
         $server->run();
     }
 
