@@ -5,7 +5,6 @@ $finder = PhpCsFixer\Finder::create()
     ->notPath('build')
     ->in(__DIR__)
     ->name('*.php')
-    ->notName('*.blade.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 

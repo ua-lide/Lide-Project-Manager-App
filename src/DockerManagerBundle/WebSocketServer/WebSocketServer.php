@@ -145,9 +145,7 @@ class WebSocketServer implements MessageComponentInterface
 
     public function retrieveDockerOutput()
     {
-        // Dummy method
         foreach ($this->users as $user) {
-            echo "Top\n";
             $out = $user->readOutput();
 
             $response = [];

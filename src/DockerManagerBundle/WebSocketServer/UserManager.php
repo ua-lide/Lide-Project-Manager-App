@@ -45,6 +45,11 @@ class UserManager
         return null;
     }
 
+    public function sendJson(array $data)
+    {
+        $this->connection->send(json_encode($data));
+    }
+
     public function readStderr()
     {
         if ($this->process) {
@@ -83,6 +88,12 @@ class UserManager
         stream_set_blocking($this->pipes[1], false);
         stream_set_blocking($this->pipes[2], false);
 
+        return true;
+    }
+
+    public function stopContainer(): bool
+    {
+        // TODO
         return true;
     }
 

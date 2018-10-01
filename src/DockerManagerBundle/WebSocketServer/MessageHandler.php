@@ -10,5 +10,5 @@ namespace DockerManagerBundle\WebSocketServer;
 
 interface MessageHandler
 {
-    public function handle(UserManager $sender, string $type, array &$data);
+    public function handle(UserManager $sender, string $type, array &$data): bool;
 }

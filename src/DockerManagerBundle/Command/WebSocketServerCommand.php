@@ -53,26 +53,28 @@ class WebSocketServerCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $environmentRepository = $this->getContainer()
-            ->get('doctrine')
-            ->getRepository("LideCommonsBundle:Environment");
+//        $environmentRepository = $this->getContainer()
+//            ->get('doctrine')
+//            ->getRepository("LideCommonsBundle:Environment");
+//
+//        $availableEnvironments = $environmentRepository->findBy([
+//            ["activated" => true]
+//        ]);
+        $availableEnvironments = [];
 
-        $availableEnvironnements = $environmentRepository->findBy([
-            ["activated" => true]
-        ]);
-
-        $wsServer = new WebSocketServer($this->logger, $availableEnvironnements);
+        $wsServer = new WebSocketServer($this->logger, $availableEnvironments);
 
         $server = IoServer::factory(
             $wsServer, //Need to wrap this into a WsServer into an HttpServer. I let it like this so i can test from terminal with telnet
             $this->port,
-            "192.168.10.11"
+            "192.168.10.11" //TODO inject this
         );
 
+        //Set the timer to retrieve output of running dockers
         $server->loop->addPeriodicTimer(0.5, function () use ($wsServer) {
             $wsServer->retrieveDockerOutput();
         });
-        $server->loop->addTimer(0.1, function () use ($output) {
+        $server->loop->futureTick(function () use ($output) {
             $output->writeln("Server running on port " . $this->port);
         });
 

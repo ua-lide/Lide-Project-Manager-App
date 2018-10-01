@@ -33,3 +33,4 @@ Vagrantfile
 .idea/deployment.xml
 .idea/dataSources*
 
+.php_cs.cache

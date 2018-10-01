@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\BashCommands;
 
-
 class BashCommandBuilder extends AbstractBashCommandBuilder
 {
     /**

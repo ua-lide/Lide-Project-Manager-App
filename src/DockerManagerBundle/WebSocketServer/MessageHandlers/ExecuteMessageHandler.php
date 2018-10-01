@@ -10,6 +10,7 @@ namespace DockerManagerBundle\WebSocketServer\MessageHandlers;
 
 use DockerManagerBundle\Exceptions\WrongMessageTypeException;
 use DockerManagerBundle\WebSocketServer\MessageHandler;
+use DockerManagerBundle\WebSocketServer\ResponseBuilder;
 use DockerManagerBundle\WebSocketServer\UserManager;
 use DockerManagerBundle\BashCommands\Docker\DockerStartCommandBuilder;
 
@@ -36,7 +37,7 @@ class ExecuteMessageHandler implements MessageHandler
         $this->dockerCpuAllocation = $dockerCpuAllocation;
     }
 
-    public function handle(UserManager $sender, string $type, array &$data)
+    public function handle(UserManager $sender, string $type, array &$data): bool
     {
         if ($type != self::$Type) {
             throw new WrongMessageTypeException(self::$Type, $type);
@@ -44,12 +45,12 @@ class ExecuteMessageHandler implements MessageHandler
 
         if (array_key_exists(self::$LaunchOptionsKey, $data)) {
             if (!is_string($data[self::$LaunchOptionsKey])) {
-                unset($data[self::$LaunchOptionsKey]);
+                return false;
             }
         }
         if (array_key_exists(self::$CompileOptionsKey, $data)) {
             if (!is_string($data[self::$CompileOptionsKey])) {
-                unset($data[self::$CompileOptionsKey]);
+                return false;
             }
         }
 
@@ -66,7 +67,14 @@ class ExecuteMessageHandler implements MessageHandler
             ->allocateCpu($this->dockerCpuAllocation)
             ->withStartCommand($this->buildDockerEntryCommand($data));
 
-        $sender->startContainer($commandBuilder);
+        $started = $sender->startContainer($commandBuilder);
+
+        if ($started === false) {
+            $responseBuilder = new ResponseBuilder(ResponseBuilder::$STATUS);
+            $responseBuilder->addDataField('is_running', $sender->isContainerRunning());
+
+            $sender->sendJson($responseBuilder->buildArray());
+        }
 
         return true;
     }
