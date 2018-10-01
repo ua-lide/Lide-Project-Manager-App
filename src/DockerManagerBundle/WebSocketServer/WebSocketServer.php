@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\WebSocketServer;
 
-
 use DockerManagerBundle\WebSocketServer\MessageHandlers\ExecuteMessageHandler;
 use Lide\CommonsBundle\Entity\Environment;
 use Psr\Log\LoggerInterface;
@@ -49,7 +48,7 @@ class WebSocketServer implements MessageComponentInterface
      * @param LoggerInterface $logger
      * @param $availableEnvironment
      */
-        public function __construct(LoggerInterface $logger, $availableEnvironment)
+    public function __construct(LoggerInterface $logger, $availableEnvironment)
     {
         $this->clients = new \SplObjectStorage();
         $this->logger = $logger;
@@ -67,7 +66,7 @@ class WebSocketServer implements MessageComponentInterface
      * @param  ConnectionInterface $conn The socket/connection that just connected to your application
      * @throws \Exception
      */
-    function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
 
@@ -87,7 +86,7 @@ class WebSocketServer implements MessageComponentInterface
      * @param  ConnectionInterface $conn The socket/connection that is closing/closed
      * @throws \Exception
      */
-    function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $conn)
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
@@ -105,7 +104,7 @@ class WebSocketServer implements MessageComponentInterface
      * @param  \Exception $e
      * @throws \Exception
      */
-    function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, \Exception $e)
     {
         // TODO: Implement onError() method.
     }
@@ -116,7 +115,7 @@ class WebSocketServer implements MessageComponentInterface
      * @param  string $msg The message received
      * @throws \Exception
      */
-    function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg)
     {
         // TODO: Implement onMessage() method.
         /** @noinspection PhpUndefinedFieldInspection */
@@ -125,18 +124,18 @@ class WebSocketServer implements MessageComponentInterface
 
         /** @noinspection PhpUndefinedFieldInspection */
         $userManager = $this->users[$from->resourceId];
-        if(is_null($userManager)){
+        if (is_null($userManager)) {
             /** @noinspection PhpUndefinedFieldInspection */
             throw new \RuntimeException("No user manager for connection " . $from->resourceId);
         }
 
-        if(!isset($messageData['type']) || !isset($messageData['data']) || !is_array($messageData['data'])){
+        if (!isset($messageData['type']) || !isset($messageData['data']) || !is_array($messageData['data'])) {
             return;
         }
 
         $type = (string)$messageData['type'];
 
-        if(!array_key_exists($type, $this->handlers)){
+        if (!array_key_exists($type, $this->handlers)) {
             return;
         }
         $handler = $this->handlers[$type];
@@ -144,7 +143,8 @@ class WebSocketServer implements MessageComponentInterface
         $handler->handle($userManager, $type, $messageData['data']);
     }
 
-    public function retrieveDockerOutput(){
+    public function retrieveDockerOutput()
+    {
         // Dummy method
         foreach ($this->users as $user) {
             echo "Top\n";
@@ -156,10 +156,9 @@ class WebSocketServer implements MessageComponentInterface
             $response['stderr'] = $user->readStderr();
             $response['running'] = $user->isContainerRunning();
 
-            if(!empty($response['stdout']) || !empty($response['stderr'] && !$response['running'])){
+            if (!empty($response['stdout']) || !empty($response['stderr'] && !$response['running'])) {
                 $user->getConnection()->send(json_encode($response, JSON_PRETTY_PRINT));
             }
-
         }
     }
 }

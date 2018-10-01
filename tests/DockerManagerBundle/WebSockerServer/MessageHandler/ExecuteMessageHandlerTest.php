@@ -39,6 +39,8 @@ class ExecuteMessageHandlerTest extends TestCase
         $data = [
             'compile_options' => '-Wall',
         ];
+
+        /** @noinspection PhpParamsInspection */
         $handler->handle($userManagerStub, ExecuteMessageHandler::$Type, $data);
     }
 

@@ -16,7 +16,6 @@ use DockerManagerBundle\BashCommands\BashCommandBuilder;
  */
 class DockerStopCommandBuilder extends BashCommandBuilder
 {
-
     private $waitTimeSet = false;
 
     /**
@@ -41,7 +40,7 @@ class DockerStopCommandBuilder extends BashCommandBuilder
      */
     public function withWaitTime($seconds)
     {
-        if($this->waitTimeSet){
+        if ($this->waitTimeSet) {
             throw new \RuntimeException("Wait time already set");
         }
         $this->addFlagArgument('-t', $seconds);

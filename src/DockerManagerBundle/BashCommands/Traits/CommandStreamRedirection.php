@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\BashCommands\Traits;
 
-
 trait CommandStreamRedirection
 {
     private $errorToStdout = false;

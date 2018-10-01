@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\WebSocketServer;
 
-
 use Lide\CommonsBundle\Entity\Environment;
 use DockerManagerBundle\BashCommands\Docker\DockerStartCommandBuilder;
 use Ratchet\ConnectionInterface;
@@ -38,34 +37,39 @@ class UserManager
         $this->connection = $connection;
     }
 
-    public function readOutput(){
-        if($this->process){
+    public function readOutput()
+    {
+        if ($this->process) {
             return stream_get_contents($this->pipes[1]);
         }
         return null;
     }
 
-    public function readStderr(){
-        if($this->process){
+    public function readStderr()
+    {
+        if ($this->process) {
             return stream_get_contents($this->pipes[2]);
         }
         return null;
     }
 
-    public function writeInput(string $input){
-        if($this->isContainerRunning()){
+    public function writeInput(string $input)
+    {
+        if ($this->isContainerRunning()) {
             fwrite($this->pipes[0], $input);
         }
     }
 
-    public function getStatus(){
-        if(is_null($this->process)){
+    public function getStatus()
+    {
+        if (is_null($this->process)) {
             return null;
         }
         return proc_get_status($this->process);
     }
 
-    public function startContainer(DockerStartCommandBuilder $commandBuilder){
+    public function startContainer(DockerStartCommandBuilder $commandBuilder)
+    {
         $descriptorSpec = [
             0 => ["pipe", "r"], // stdin est un pipe où le processus va lire
             1 => ["pipe", "w"], // stdout est un pipe où le processus va écrire
@@ -90,12 +94,13 @@ class UserManager
         return $this->lastReturnValue;
     }
 
-    public function isContainerRunning() : bool {
-        if(!is_null($this->process)){
+    public function isContainerRunning() : bool
+    {
+        if (!is_null($this->process)) {
             $statusArray = proc_get_status($this->process);
-            if($statusArray['running']){
+            if ($statusArray['running']) {
                 return true;
-            }else{
+            } else {
                 // Clean up process
                 fclose($this->pipes[0]);
                 fclose($this->pipes[1]);
@@ -113,7 +118,8 @@ class UserManager
         return $this->connection;
     }
 
-    public function getEnvironment() : Environment{
+    public function getEnvironment() : Environment
+    {
         //TODO real stuff
         $env = new Environment();
         $env->setName("Test");
@@ -126,7 +132,8 @@ class UserManager
      * Return the absolute path of the selected project
      * @return string
      */
-    public function getProjetAbsolutePath() : string{
+    public function getProjetAbsolutePath() : string
+    {
         //TODO
         return "/";
     }
@@ -135,7 +142,8 @@ class UserManager
      * Get the docker image name for the environment of the user project
      * @return string
      */
-    public function getProjectsEnvironmentsDockerImage() : string{
+    public function getProjectsEnvironmentsDockerImage() : string
+    {
         //TODO implementation
         return "gpp";
     }

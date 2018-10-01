@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\BashCommands\Docker;
 
-
 use DockerManagerBundle\BashCommands\AbstractBashCommandBuilder;
 use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
@@ -37,33 +36,35 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
     {
         $builder = new BashCommandBuilder('docker run');
 
-        if($this->remove){
+        if ($this->remove) {
             $builder->addRawArgument('--rm=true');
         }
-        if($this->identifier){
+        if ($this->identifier) {
             $builder->addFlagArgument('--name', $this->identifier);
         }
-        foreach ($this->addedHosts as $addedHost){
+        foreach ($this->addedHosts as $addedHost) {
             $builder->addFlagArgument('--add-host', $addedHost);
         }
 
-        if($this->inputFlag) $builder->addRawArgument('-a stdin');
+        if ($this->inputFlag) {
+            $builder->addRawArgument('-a stdin');
+        }
 
-        if($this->pseudoTty){
+        if ($this->pseudoTty) {
             $builder->addRawArgument('-a stdout');
             $builder->addRawArgument('-a stderr');
         }
 
-        if(!is_null($this->cpuCount)){
+        if (!is_null($this->cpuCount)) {
             $builder->addFlagArgument('--cpus', $this->cpuCount);
         }
 
-        if(is_null($this->allocatedMemory)){
+        if (is_null($this->allocatedMemory)) {
             $builder->addFlagArgument('-m', $this->allocatedMemory);
         }
 
         $builder->addRawArgument($this->dockerImageIdentifier);
-        if($this->startCommand){
+        if ($this->startCommand) {
             $builder->addRawArgument($this->startCommand);
         }
 
@@ -136,7 +137,7 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
      */
     public function addHost($url, $ip = null)
     {
-        if(is_null($ip)){
+        if (is_null($ip)) {
             $this->addedHosts[] = $url;
         } else {
             $this->addedHosts[] = "{$url}:{$ip}";

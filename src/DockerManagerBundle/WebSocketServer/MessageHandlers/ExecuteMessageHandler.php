@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\WebSocketServer\MessageHandlers;
 
-
 use DockerManagerBundle\Exceptions\WrongMessageTypeException;
 use DockerManagerBundle\WebSocketServer\MessageHandler;
 use DockerManagerBundle\WebSocketServer\UserManager;
@@ -26,10 +25,10 @@ class ExecuteMessageHandler implements MessageHandler
      */
     private $dockerCpuAllocation;
 
-    static $Type = "execute";
+    public static $Type = "execute";
 
-    static $CompileOptionsKey = "compile_options";
-    static $LaunchOptionsKey = "launch_options";
+    public static $CompileOptionsKey = "compile_options";
+    public static $LaunchOptionsKey = "launch_options";
 
     public function __construct(string $dockerMemoryAllocation = "10M", int $dockerCpuAllocation = 1)
     {
@@ -39,17 +38,17 @@ class ExecuteMessageHandler implements MessageHandler
 
     public function handle(UserManager $sender, string $type, array &$data)
     {
-        if($type != self::$Type){
+        if ($type != self::$Type) {
             throw new WrongMessageTypeException(self::$Type, $type);
         }
 
-        if(array_key_exists(self::$LaunchOptionsKey, $data)){
-            if(!is_string($data[self::$LaunchOptionsKey])){
+        if (array_key_exists(self::$LaunchOptionsKey, $data)) {
+            if (!is_string($data[self::$LaunchOptionsKey])) {
                 unset($data[self::$LaunchOptionsKey]);
             }
         }
-        if(array_key_exists(self::$CompileOptionsKey, $data)){
-            if(!is_string($data[self::$CompileOptionsKey])){
+        if (array_key_exists(self::$CompileOptionsKey, $data)) {
+            if (!is_string($data[self::$CompileOptionsKey])) {
                 unset($data[self::$CompileOptionsKey]);
             }
         }
@@ -57,7 +56,7 @@ class ExecuteMessageHandler implements MessageHandler
 
         $image = $sender->getProjectsEnvironmentsDockerImage();
 
-        if(is_null($image)){
+        if (is_null($image)) {
             return false;
         }
 
@@ -75,7 +74,8 @@ class ExecuteMessageHandler implements MessageHandler
     /**
      * @return string
      */
-    protected function buildDockerEntryCommand(array $options) : string {
+    protected function buildDockerEntryCommand(array $options) : string
+    {
         //TODO real implementation
         return "/bin/bash -c \"ping 8.8.8.8\"";
     }

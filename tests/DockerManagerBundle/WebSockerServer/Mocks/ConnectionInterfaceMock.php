@@ -8,12 +8,10 @@
 
 namespace Tests\DockerManagerBundle\WebSockerServer\Mocks;
 
-
 use Ratchet\ConnectionInterface;
 
 class ConnectionInterfaceMock implements ConnectionInterface
 {
-
     protected $sentData = [];
 
     protected $closed = false;
@@ -35,7 +33,7 @@ class ConnectionInterfaceMock implements ConnectionInterface
      * @param  string $data
      * @return \Ratchet\ConnectionInterface
      */
-    function send($data)
+    public function send($data)
     {
         $this->sentData[] = $data;
         return $this;
@@ -44,7 +42,7 @@ class ConnectionInterfaceMock implements ConnectionInterface
     /**
      * Close the connection
      */
-    function close()
+    public function close()
     {
         $this->closed = true;
     }

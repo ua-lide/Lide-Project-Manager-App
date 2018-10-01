@@ -9,8 +9,6 @@
 namespace DockerManagerBundle\BashCommands;
 
 
-use DockerManagerBundle\BashCommands\AbstractBashCommandBuilder;
-
 class BashCommandBuilder extends AbstractBashCommandBuilder
 {
     /**
@@ -38,9 +36,9 @@ class BashCommandBuilder extends AbstractBashCommandBuilder
 
     public function addFlagArgument($flag, $arg = null)
     {
-        if(is_null($arg)){
+        if (is_null($arg)) {
             $this->args[] = $flag;
-        }else{
+        } else {
             $this->args[] = "{$flag} $arg";
         }
         return $this;

@@ -8,8 +8,6 @@
 
 namespace DockerManagerBundle\BashCommands;
 
-
-
 use DockerManagerBundle\BashCommands\Traits\CommandStreamRedirection;
 use DockerManagerBundle\BashCommands\Traits\CommandWithTimeout;
 
@@ -25,24 +23,23 @@ abstract class AbstractBashCommandBuilder
      */
     public function build()
     {
-            return $this->buildTimeoutPrefix(). " " . $this->buildCommand() . " " . $this->buildRedirectOutput() . $this->buildChain();
+        return $this->buildTimeoutPrefix(). " " . $this->buildCommand() . " " . $this->buildRedirectOutput() . $this->buildChain();
     }
 
     /**
      * @return string
      */
-    protected abstract function buildCommand();
+    abstract protected function buildCommand();
 
     private function buildChain()
     {
         $ret = "";
-        foreach ($this->commandsAfter as $commandAfter)
-        {
-            if(isset($commandAfter['builder'])){
+        foreach ($this->commandsAfter as $commandAfter) {
+            if (isset($commandAfter['builder'])) {
                 /** @var AbstractBashCommandBuilder $builder */
                 $builder = $commandAfter['builder'];
                 $ret .= $commandAfter['separator'] . " ( ". $builder->build() . ")";
-            }else{
+            } else {
                 $ret .= $commandAfter['separator'] . " ( ". $commandAfter['raw'] . ")";
             }
         }
@@ -54,7 +51,8 @@ abstract class AbstractBashCommandBuilder
      * @param AbstractBashCommandBuilder $commandBuilder
      * @return static
      */
-    public function then(AbstractBashCommandBuilder $commandBuilder){
+    public function then(AbstractBashCommandBuilder $commandBuilder)
+    {
         $this->commandsAfter[] = [
             'builder' => $commandBuilder,
             'separator' => ';'
@@ -66,7 +64,8 @@ abstract class AbstractBashCommandBuilder
      * @param AbstractBashCommandBuilder $commandBuilder
      * @return static
      */
-    public function thenIfSuccess(AbstractBashCommandBuilder $commandBuilder){
+    public function thenIfSuccess(AbstractBashCommandBuilder $commandBuilder)
+    {
         $this->commandsAfter[] = [
             'builder' => $commandBuilder,
             'separator' => '&&'
@@ -78,7 +77,8 @@ abstract class AbstractBashCommandBuilder
      * @param AbstractBashCommandBuilder $commandBuilder
      * @return static
      */
-    public function thenIfFailed(AbstractBashCommandBuilder $commandBuilder){
+    public function thenIfFailed(AbstractBashCommandBuilder $commandBuilder)
+    {
         $this->commandsAfter[] = [
             'builder' => $commandBuilder,
             'separator' => '||'
@@ -86,21 +86,24 @@ abstract class AbstractBashCommandBuilder
         return $this;
     }
 
-    public function thenRaw($raw){
+    public function thenRaw($raw)
+    {
         $this->commandsAfter[] = [
             'raw' => $raw,
             'separator' => ';'
         ];
     }
 
-    public function thenIfSuccessRaw($raw){
+    public function thenIfSuccessRaw($raw)
+    {
         $this->commandsAfter[] = [
             'raw' => $raw,
             'separator' => '&&'
         ];
     }
 
-    public function thenIfFailedRaw($raw){
+    public function thenIfFailedRaw($raw)
+    {
         $this->commandsAfter[] = [
             'raw' => $raw,
             'separator' => ' || '

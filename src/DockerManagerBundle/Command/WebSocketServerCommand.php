@@ -53,7 +53,6 @@ class WebSocketServerCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $environmentRepository = $this->getContainer()
             ->get('doctrine')
             ->getRepository("LideCommonsBundle:Environment");
@@ -70,10 +69,10 @@ class WebSocketServerCommand extends ContainerAwareCommand
             "192.168.10.11"
         );
 
-        $server->loop->addPeriodicTimer(0.5, function () use ($wsServer){
+        $server->loop->addPeriodicTimer(0.5, function () use ($wsServer) {
             $wsServer->retrieveDockerOutput();
         });
-        $server->loop->addTimer(0.1, function () use ($output){
+        $server->loop->addTimer(0.1, function () use ($output) {
             $output->writeln("Server running on port " . $this->port);
         });
 
