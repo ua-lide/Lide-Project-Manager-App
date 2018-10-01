@@ -6,7 +6,7 @@
  * Time: 17:49
  */
 
-namespace MainBundle\BashCommands\Traits;
+namespace DockerManagerBundle\BashCommands\Traits;
 
 
 trait CommandWithTimeout

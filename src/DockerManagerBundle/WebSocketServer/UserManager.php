@@ -9,6 +9,8 @@
 namespace DockerManagerBundle\WebSocketServer;
 
 
+use Lide\CommonsBundle\Entity\Environment;
+use DockerManagerBundle\BashCommands\Docker\DockerStartCommandBuilder;
 use Ratchet\ConnectionInterface;
 
 class UserManager
@@ -63,24 +65,21 @@ class UserManager
         return proc_get_status($this->process);
     }
 
-    public function startContainer(){
-        //Build Command
-        // TODO
-
-        $cmd = "docker run -a stdin -a stdout -a stderr gpp /bin/bash -c \"ping 8.8.8.8\"";
-
-        $descriptorspec = [
-            0 => ["pipe", "r"],  // // stdin est un pipe où le processus va lire
-            1 => ["pipe", "w"],  // stdout est un pipe où le processus va écrire
-            2 => ["pipe", "w"] // stdout est un pipe où le processus va écrire
+    public function startContainer(DockerStartCommandBuilder $commandBuilder){
+        $descriptorSpec = [
+            0 => ["pipe", "r"], // stdin est un pipe où le processus va lire
+            1 => ["pipe", "w"], // stdout est un pipe où le processus va écrire
+            2 => ["pipe", "w"]  // stdout est un pipe où le processus va écrire
         ];
 
         // Then start it with proc_open
-        $this->process= proc_open($cmd, $descriptorspec, $this->pipes, "/home", null);
+        $this->process= proc_open($commandBuilder->build(), $descriptorSpec, $this->pipes, "/home", null);
 
         //Set the pipe in non blocking
         stream_set_blocking($this->pipes[1], false);
         stream_set_blocking($this->pipes[2], false);
+
+        return true;
     }
 
     /**
@@ -112,5 +111,32 @@ class UserManager
     public function getConnection(): ConnectionInterface
     {
         return $this->connection;
+    }
+
+    public function getEnvironment() : Environment{
+        //TODO real stuff
+        $env = new Environment();
+        $env->setName("Test");
+        $env->setImage("gpp");
+        $env->setActivated(true);
+        return $env;
+    }
+
+    /**
+     * Return the absolute path of the selected project
+     * @return string
+     */
+    public function getProjetAbsolutePath() : string{
+        //TODO
+        return "/";
+    }
+
+    /**
+     * Get the docker image name for the environment of the user project
+     * @return string
+     */
+    public function getProjectsEnvironmentsDockerImage() : string{
+        //TODO implementation
+        return "gpp";
     }
 }

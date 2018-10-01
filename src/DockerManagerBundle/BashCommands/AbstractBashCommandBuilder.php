@@ -6,12 +6,12 @@
  * Time: 17:43
  */
 
-namespace MainBundle\BashCommands;
+namespace DockerManagerBundle\BashCommands;
 
 
 
-use MainBundle\BashCommands\Traits\CommandStreamRedirection;
-use MainBundle\BashCommands\Traits\CommandWithTimeout;
+use DockerManagerBundle\BashCommands\Traits\CommandStreamRedirection;
+use DockerManagerBundle\BashCommands\Traits\CommandWithTimeout;
 
 abstract class AbstractBashCommandBuilder
 {

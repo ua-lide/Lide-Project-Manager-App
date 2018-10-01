@@ -9,6 +9,8 @@
 namespace DockerManagerBundle\WebSocketServer;
 
 
+use DockerManagerBundle\WebSocketServer\MessageHandlers\ExecuteMessageHandler;
+use Lide\CommonsBundle\Entity\Environment;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -26,20 +28,37 @@ class WebSocketServer implements MessageComponentInterface
      */
     protected $users;
 
+
     /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
+     * @var Environment[]
+     */
+    private $availableEnvironement;
+
+    /**
+     * @var MessageHandler[]
+     */
+    private $handlers;
+
+    /**
      * WebSocketServer constructor.
      * @param LoggerInterface $logger
+     * @param $availableEnvironment
      */
-    public function __construct(LoggerInterface $logger)
+        public function __construct(LoggerInterface $logger, $availableEnvironment)
     {
         $this->clients = new \SplObjectStorage();
         $this->logger = $logger;
         $this->users = [];
+        $this->availableEnvironement = $availableEnvironment;
+
+        $this->handlers = [ //TODO inject this
+            "execute" => new ExecuteMessageHandler(),
+        ];
     }
 
 
@@ -59,8 +78,6 @@ class WebSocketServer implements MessageComponentInterface
         $userManager = new UserManager($conn); //TODO attach user entity
         /** @noinspection PhpUndefinedFieldInspection */
         $this->users[$conn->resourceId] = $userManager;
-
-        $userManager->startContainer();
 
         $conn->send("Connected");
     }
@@ -103,7 +120,28 @@ class WebSocketServer implements MessageComponentInterface
     {
         // TODO: Implement onMessage() method.
         /** @noinspection PhpUndefinedFieldInspection */
-        $from->send($msg); //Echo
+
+        $messageData = json_decode($msg, true, 4);
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        $userManager = $this->users[$from->resourceId];
+        if(is_null($userManager)){
+            /** @noinspection PhpUndefinedFieldInspection */
+            throw new \RuntimeException("No user manager for connection " . $from->resourceId);
+        }
+
+        if(!isset($messageData['type']) || !isset($messageData['data']) || !is_array($messageData['data'])){
+            return;
+        }
+
+        $type = (string)$messageData['type'];
+
+        if(!array_key_exists($type, $this->handlers)){
+            return;
+        }
+        $handler = $this->handlers[$type];
+
+        $handler->handle($userManager, $type, $messageData['data']);
     }
 
     public function retrieveDockerOutput(){

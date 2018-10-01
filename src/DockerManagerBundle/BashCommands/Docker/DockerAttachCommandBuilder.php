@@ -6,10 +6,10 @@
  * Time: 14:55
  */
 
-namespace MainBundle\BashCommands\Docker;
+namespace DockerManagerBundle\BashCommands\Docker;
 
 
-use MainBundle\BashCommands\BashCommandBuilder;
+use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
 class DockerAttachCommandBuilder extends BashCommandBuilder
 {

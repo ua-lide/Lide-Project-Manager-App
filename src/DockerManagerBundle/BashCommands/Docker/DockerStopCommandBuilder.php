@@ -6,14 +6,13 @@
  * Time: 14:54
  */
 
-namespace MainBundle\BashCommands\Docker;
+namespace DockerManagerBundle\BashCommands\Docker;
 
-use MainBundle\BashCommands\BashCommandBuilder;
+use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
 /**
  * Class DockerStopCommandBuilder
  * This class is a helper to build a docker stop command
- * @package MainBundle\Docker
  */
 class DockerStopCommandBuilder extends BashCommandBuilder
 {

@@ -3,9 +3,10 @@
 namespace DockerManagerBundle\Command;
 
 use DockerManagerBundle\WebSocketServer\WebSocketServer;
+use Lide\CommonsBundle\Repository\EnvironnementRepository;
 use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Paulin Violette
  * @since 1.0
  */
-class WebSocketServerCommand extends Command
+class WebSocketServerCommand extends ContainerAwareCommand
 {
     /**
      * @var LoggerInterface
@@ -25,6 +26,10 @@ class WebSocketServerCommand extends Command
      * @var int
      */
     private $port;
+    /**
+     * @var EnvironnementRepository
+     */
+    private $environnementRepository;
 
 
     /**
@@ -41,14 +46,23 @@ class WebSocketServerCommand extends Command
 
     protected function configure()
     {
-        $this->setName('dockermanager:start-server')
+        $this->setName('lide:start-server')
             ->setDescription('Start the websocket server')
             ->setHelp('Start the websocket server handling the users programs execution');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $wsServer = new WebSocketServer($this->logger);
+
+        $environmentRepository = $this->getContainer()
+            ->get('doctrine')
+            ->getRepository("LideCommonsBundle:Environment");
+
+        $availableEnvironnements = $environmentRepository->findBy([
+            ["activated" => true]
+        ]);
+
+        $wsServer = new WebSocketServer($this->logger, $availableEnvironnements);
 
         $server = IoServer::factory(
             $wsServer, //Need to wrap this into a WsServer into an HttpServer. I let it like this so i can test from terminal with telnet
@@ -65,5 +79,4 @@ class WebSocketServerCommand extends Command
 
         $server->run();
     }
-
 }

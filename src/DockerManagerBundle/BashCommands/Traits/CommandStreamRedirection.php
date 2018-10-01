@@ -6,7 +6,7 @@
  * Time: 15:54
  */
 
-namespace MainBundle\BashCommands\Traits;
+namespace DockerManagerBundle\BashCommands\Traits;
 
 
 trait CommandStreamRedirection

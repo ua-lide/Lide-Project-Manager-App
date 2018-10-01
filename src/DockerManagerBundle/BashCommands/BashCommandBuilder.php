@@ -6,8 +6,10 @@
  * Time: 18:09
  */
 
-namespace MainBundle\BashCommands;
+namespace DockerManagerBundle\BashCommands;
 
+
+use DockerManagerBundle\BashCommands\AbstractBashCommandBuilder;
 
 class BashCommandBuilder extends AbstractBashCommandBuilder
 {

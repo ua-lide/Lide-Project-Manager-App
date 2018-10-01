@@ -6,11 +6,11 @@
  * Time: 14:54
  */
 
-namespace MainBundle\BashCommands\Docker;
+namespace DockerManagerBundle\BashCommands\Docker;
 
 
-use MainBundle\BashCommands\AbstractBashCommandBuilder;
-use MainBundle\BashCommands\BashCommandBuilder;
+use DockerManagerBundle\BashCommands\AbstractBashCommandBuilder;
+use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
 class DockerStartCommandBuilder extends AbstractBashCommandBuilder
 {
@@ -47,9 +47,12 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
             $builder->addFlagArgument('--add-host', $addedHost);
         }
 
-        if($this->inputFlag) $builder->addRawArgument('-i');
+        if($this->inputFlag) $builder->addRawArgument('-a stdin');
 
-        if($this->pseudoTty) $builder->addRawArgument('-t');
+        if($this->pseudoTty){
+            $builder->addRawArgument('-a stdout');
+            $builder->addRawArgument('-a stderr');
+        }
 
         if(!is_null($this->cpuCount)){
             $builder->addFlagArgument('--cpus', $this->cpuCount);
