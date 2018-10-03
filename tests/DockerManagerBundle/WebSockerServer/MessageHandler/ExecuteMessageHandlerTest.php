@@ -6,13 +6,13 @@
  * Time: 14:42
  */
 
-namespace Tests\DockerManagerBundle\WebSockerServer\MessageHandler;
+namespace Tests\DockerManagerBundle\WebSocketServer\MessageHandler;
 
 use DockerManagerBundle\Exceptions\WrongMessageTypeException;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\ExecuteMessageHandler;
 use DockerManagerBundle\WebSocketServer\UserManager;
 use PHPUnit\Framework\TestCase;
-use Tests\DockerManagerBundle\WebSockerServer\Mocks\ConnectionInterfaceMock;
+use Tests\DockerManagerBundle\WebSocketServer\Mocks\ConnectionInterfaceMock;
 
 class ExecuteMessageHandlerTest extends TestCase
 {
@@ -23,7 +23,6 @@ class ExecuteMessageHandlerTest extends TestCase
     public function testHandle()
     {
         $userManagerStub  = $this->createMock(UserManager::class);
-
 
         $userManagerStub->expects($this->once())
             ->method('startContainer')
@@ -118,7 +117,7 @@ class ExecuteMessageHandlerTest extends TestCase
     {
         $handler = new ExecuteMessageHandler();
 
-        $userManager = new UserManager(new ConnectionInterfaceMock());
+        $userManager = new UserManager(new ConnectionInterfaceMock(), "/home");
 
         $data = [];
         $this->expectException(WrongMessageTypeException::class);

@@ -6,13 +6,13 @@
  * Time: 16:34
  */
 
-namespace Tests\DockerManagerBundle\WebSockerServer\MessageHandler;
+namespace Tests\DockerManagerBundle\WebSocketServer\MessageHandler;
 
 use DockerManagerBundle\Exceptions\WrongMessageTypeException;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\ForceStopMessageHandler;
 use DockerManagerBundle\WebSocketServer\UserManager;
 use PHPUnit\Framework\TestCase;
-use Tests\DockerManagerBundle\WebSockerServer\Mocks\ConnectionInterfaceMock;
+use Tests\DockerManagerBundle\WebSocketServer\Mocks\ConnectionInterfaceMock;
 
 class ForceStopMessageHandlerTest extends TestCase
 {
@@ -38,7 +38,7 @@ class ForceStopMessageHandlerTest extends TestCase
     {
         $handler = new ForceStopMessageHandler();
 
-        $userManager = new UserManager(new ConnectionInterfaceMock());
+        $userManager = new UserManager(new ConnectionInterfaceMock(), "/home");
 
         $data = [];
         $this->expectException(WrongMessageTypeException::class);

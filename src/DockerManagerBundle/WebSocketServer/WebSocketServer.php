@@ -9,7 +9,11 @@
 namespace DockerManagerBundle\WebSocketServer;
 
 use DockerManagerBundle\WebSocketServer\MessageHandlers\ExecuteMessageHandler;
+use DockerManagerBundle\WebSocketServer\MessageHandlers\ForceStopMessageHandler;
+use DockerManagerBundle\WebSocketServer\MessageHandlers\GetStatusMessageHandler;
+use DockerManagerBundle\WebSocketServer\MessageHandlers\InputMessageHandler;
 use Lide\CommonsBundle\Entity\Environment;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -36,28 +40,44 @@ class WebSocketServer implements MessageComponentInterface
     /**
      * @var Environment[]
      */
-    private $availableEnvironement;
+    private $availableEnvironment;
 
     /**
      * @var MessageHandler[]
      */
     private $handlers;
+    /**
+     * @var UserManagerFactory
+     */
+    private $userManagerFactory;
+    /**
+     * @var string
+     */
+    private $projectsFolder;
 
     /**
      * WebSocketServer constructor.
      * @param LoggerInterface $logger
+     * @param UserManagerFactory $userManagerFactory
+     * @param string $projectsFolder
      * @param $availableEnvironment
      */
-    public function __construct(LoggerInterface $logger, $availableEnvironment)
+    public function __construct(LoggerInterface $logger, UserManagerFactory $userManagerFactory, string $projectsFolder, $availableEnvironment)
     {
         $this->clients = new \SplObjectStorage();
         $this->logger = $logger;
         $this->users = [];
-        $this->availableEnvironement = $availableEnvironment;
+        $this->availableEnvironment = $availableEnvironment;
 
         $this->handlers = [ //TODO inject this
-            "execute" => new ExecuteMessageHandler(),
+            ExecuteMessageHandler::$Type => new ExecuteMessageHandler(),
+            ForceStopMessageHandler::$Type => new ForceStopMessageHandler(),
+            GetStatusMessageHandler::$Type => new GetStatusMessageHandler(),
+            InputMessageHandler::$Type => new InputMessageHandler()
         ];
+
+        $this->userManagerFactory = $userManagerFactory;
+        $this->projectsFolder = $projectsFolder;
     }
 
 
@@ -73,8 +93,13 @@ class WebSocketServer implements MessageComponentInterface
         /** @noinspection PhpUndefinedFieldInspection */
         $this->logger->info("New connection " . $conn->resourceId);
 
+        /** @var RequestInterface $request */
         /** @noinspection PhpUndefinedFieldInspection */
-        $userManager = new UserManager($conn); //TODO attach user entity
+        $request = $conn->httpRequest;
+
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        $userManager = $this->userManagerFactory->create($conn, ""); //TODO attach user entity
         /** @noinspection PhpUndefinedFieldInspection */
         $this->users[$conn->resourceId] = $userManager;
 
@@ -117,10 +142,10 @@ class WebSocketServer implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        // TODO: Implement onMessage() method.
-        /** @noinspection PhpUndefinedFieldInspection */
-
+        //Limit to 4 depth because message shouldn't have more
         $messageData = json_decode($msg, true, 4);
+
+        //TODO erro handling
 
         /** @noinspection PhpUndefinedFieldInspection */
         $userManager = $this->users[$from->resourceId];

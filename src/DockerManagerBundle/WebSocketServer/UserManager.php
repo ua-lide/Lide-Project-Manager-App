@@ -14,35 +14,58 @@ use Ratchet\ConnectionInterface;
 
 class UserManager
 {
-    /**
-     * @var resource $process
-     */
-    protected $process;
 
     /**
-     * Index 0 for input, index 1 for output
-     * @var resource[]
+     * @var ProcessManager
      */
-    protected $pipes;
+    protected $processManager;
 
-    private $lastReturnValue;
 
     /**
      * @var ConnectionInterface
      */
     private $connection;
 
-    public function __construct(ConnectionInterface $connection)
+    /**
+     * @var string
+     */
+    private $projectPath;
+
+    private $user_id;
+
+    private $project_id;
+    /**
+     * @var string
+     */
+    private $dockerExecutionDirectory;
+
+    /**
+     * UserManager constructor.
+     * @param ConnectionInterface $connection
+     * @param string $projectPath
+     * @param string $dockerExecutionDirectory
+     */
+    public function __construct(ConnectionInterface $connection, string $projectPath, string $dockerExecutionDirectory = ".")
     {
         $this->connection = $connection;
+        $this->projectPath = $projectPath;
+        $this->dockerExecutionDirectory = $dockerExecutionDirectory;
     }
 
-    public function readOutput()
+    /**
+     * @return mixed
+     */
+    public function getUserId()
     {
-        if ($this->process) {
-            return stream_get_contents($this->pipes[1]);
-        }
-        return null;
+        return $this->user_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
     }
 
     public function sendJson(array $data)
@@ -50,73 +73,37 @@ class UserManager
         $this->connection->send(json_encode($data));
     }
 
-    public function readStderr()
-    {
-        if ($this->process) {
-            return stream_get_contents($this->pipes[2]);
-        }
-        return null;
-    }
-
-    public function writeInput(string $input)
-    {
-        if ($this->isContainerRunning()) {
-            fwrite($this->pipes[0], $input);
-        }
-    }
-
-    public function getStatus()
-    {
-        if (is_null($this->process)) {
-            return null;
-        }
-        return proc_get_status($this->process);
-    }
-
     public function startContainer(DockerStartCommandBuilder $commandBuilder)
     {
-        $descriptorSpec = [
-            0 => ["pipe", "r"], // stdin est un pipe où le processus va lire
-            1 => ["pipe", "w"], // stdout est un pipe où le processus va écrire
-            2 => ["pipe", "w"]  // stdout est un pipe où le processus va écrire
-        ];
 
-        // Then start it with proc_open
-        $this->process= proc_open($commandBuilder->build(), $descriptorSpec, $this->pipes, "/home", null);
+        $this->processManager = new ProcessManager($commandBuilder->build(), $this->dockerExecutionDirectory);
 
-        //Set the pipe in non blocking
-        stream_set_blocking($this->pipes[1], false);
-        stream_set_blocking($this->pipes[2], false);
+        $this->processManager->start();
 
-        return true;
-    }
-
-    public function stopContainer(): bool
-    {
-        // TODO
         return true;
     }
 
     /**
-     * @return mixed
+     * @return ProcessManager|null
      */
-    public function getLastReturnValue()
+    public function getProcessManager()
     {
-        return $this->lastReturnValue;
+        return $this->processManager;
     }
+
+    public function stopContainer(): bool
+    {
+        if (!is_null($this->processManager)) {
+            $this->processManager->close();
+        }
+        return true;
+    }
+
 
     public function isContainerRunning() : bool
     {
-        if (!is_null($this->process)) {
-            $statusArray = proc_get_status($this->process);
-            if ($statusArray['running']) {
-                return true;
-            } else {
-                // Clean up process
-                fclose($this->pipes[0]);
-                fclose($this->pipes[1]);
-                $this->lastReturnValue = proc_close($this->process);
-            }
+        if (!is_null($this->processManager)) {
+            return $this->processManager->isRunning();
         }
         return false;
     }
@@ -158,4 +145,10 @@ class UserManager
         //TODO implementation
         return "gpp";
     }
+
+    public function writeInput(string $input)
+    {
+        $this->processManager->writeInput($input);
+    }
+
 }

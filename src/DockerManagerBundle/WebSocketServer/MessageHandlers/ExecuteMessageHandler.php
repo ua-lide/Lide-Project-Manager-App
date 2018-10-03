@@ -80,6 +80,7 @@ class ExecuteMessageHandler implements MessageHandler
     }
 
     /**
+     * @param array $options
      * @return string
      */
     protected function buildDockerEntryCommand(array $options) : string

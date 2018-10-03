@@ -6,13 +6,13 @@
  * Time: 15:45
  */
 
-namespace Tests\DockerManagerBundle\WebSockerServer\MessageHandler;
+namespace Tests\DockerManagerBundle\WebSocketServer\MessageHandler;
 
 use DockerManagerBundle\Exceptions\WrongMessageTypeException;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\GetStatusMessageHandler;
 use DockerManagerBundle\WebSocketServer\UserManager;
 use PHPUnit\Framework\TestCase;
-use Tests\DockerManagerBundle\WebSockerServer\Mocks\ConnectionInterfaceMock;
+use Tests\DockerManagerBundle\WebSocketServer\Mocks\ConnectionInterfaceMock;
 
 class GetStatusMessageHandlerTest extends TestCase
 {
@@ -47,7 +47,7 @@ class GetStatusMessageHandlerTest extends TestCase
     {
         $handler = new GetStatusMessageHandler();
 
-        $userManager = new UserManager(new ConnectionInterfaceMock());
+        $userManager = new UserManager(new ConnectionInterfaceMock(), "/home");
 
         $data = [];
         $this->expectException(WrongMessageTypeException::class);

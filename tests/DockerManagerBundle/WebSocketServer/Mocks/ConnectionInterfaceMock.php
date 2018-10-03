@@ -6,7 +6,7 @@
  * Time: 14:56
  */
 
-namespace Tests\DockerManagerBundle\WebSockerServer\Mocks;
+namespace Tests\DockerManagerBundle\WebSocketServer\Mocks;
 
 use Ratchet\ConnectionInterface;
 
