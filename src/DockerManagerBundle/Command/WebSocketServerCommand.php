@@ -4,7 +4,6 @@ namespace DockerManagerBundle\Command;
 
 use DockerManagerBundle\WebSocketServer\UserManagerFactory;
 use DockerManagerBundle\WebSocketServer\WebSocketServer;
-use Lide\CommonsBundle\Repository\EnvironnementRepository;
 use Psr\Log\LoggerInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
@@ -25,14 +24,12 @@ class WebSocketServerCommand extends ContainerAwareCommand
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var int
      */
     private $port;
-    /**
-     * @var EnvironnementRepository
-     */
-    private $environnementRepository;
+
     /**
      * @var UserManagerFactory
      */
