@@ -69,3 +69,13 @@ swiftmailer:
 sensio_framework_extra:
    router:
         annotations: false
+   request: { converters: true }
+
+fos_rest:
+    body_converter:
+        enabled: true
+    format_listener:
+        rules:
+            - { path: '^/', priorities: ['json'], fallback_format: 'json' }
+    view:
+        view_response_listener: true
