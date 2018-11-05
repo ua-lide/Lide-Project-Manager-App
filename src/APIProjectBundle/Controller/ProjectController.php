@@ -17,39 +17,21 @@ class ProjectController extends Controller
 
     /**
      * @Rest\Post("/api/project")
-     *
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Rest\View(
+     *     statusCode = 200
+     * )
+     * @ParamConverter("projet", converter="fos_rest.request_body")
      */
-    public function createProject(Request $request) {
+    public function createProject(Projet $projet) {
 
-        $projet = new Projet();
+        $em = $this->getDoctrine()->getManager();
 
-        $formBuilder = $this->createFormBuilder(FormType::class, $projet);
+        $em->persist($projet);
+        $em->flush();
 
-        $formBuilder
-            ->add('id', IntegerType::class)
-            ->add('name', TextType::class)
-            ->add('user_id', IntegerType::class)
-            ->add('environnement_id', IntegerType::class)
-            ->add('is_public', TextType::class)
-            ->add('is_archived', TextType::class)
-            ->add('created_at', DateType::class)
-            ->add('updated_at', DateType::class)
-        ;
+        //traitement des données (classe CreateProjectJob)
 
-        $form = $formBuilder->getForm();
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            //traitement des données (classe CreateProjectJob)
-        }
-
-        //exemple
-        return $this->render('default/index.html.twig', array(
-            'form' => $form->createView(),
-        ));
+        return $projet;
 
     }
 
