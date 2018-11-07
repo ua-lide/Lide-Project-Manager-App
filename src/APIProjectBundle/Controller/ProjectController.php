@@ -7,6 +7,8 @@ use APIProjectBundle\Entity\Projet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use APIProjectBundle\Controller\CreateProjectJob;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProjectController extends Controller
 {
@@ -34,9 +36,17 @@ class ProjectController extends Controller
 
     /**
      * @Rest\Get("/api/project/{idProject}/")
+     * @Rest\View()
      */
-    public function getProject() {
+    public function getProject(Request $request) {
+        $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
+            ->find($request->get('id'));
 
+        if (empty($projet)) {
+            return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $projet;
     }
 
     /**
