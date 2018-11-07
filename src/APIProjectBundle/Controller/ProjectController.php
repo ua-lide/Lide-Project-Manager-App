@@ -6,11 +6,7 @@ namespace APIProjectBundle\Controller;
 use APIProjectBundle\Entity\Projet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\HttpFoundation\Request;
+use APIProjectBundle\Controller\CreateProjectJob;
 
 class ProjectController extends Controller
 {
@@ -29,7 +25,8 @@ class ProjectController extends Controller
         $em->persist($projet);
         $em->flush();
 
-        //traitement des données (classe CreateProjectJob)
+        $job = new CreateProjectJob($projet);
+        $job->handle();
 
         return $projet;
 

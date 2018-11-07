@@ -46,28 +46,28 @@ class Projet
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_public", type="boolean")
+     * @ORM\Column(name="is_public", type="boolean", option={"default": false})
      */
     private $is_public;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_archived", type="boolean")
+     * @ORM\Column(name="is_archived", type="boolean", option={"default": false})
      */
     private $is_archived;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="createad_at", type="date")
+     * @ORM\Column(name="createad_at", type="datetime", option={"default": 0})
      */
     private $created_at;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updated_at", type="date")
+     * @ORM\Column(name="updated_at", type="datetime", option={"default": 0})
      */
     private $updated_at;
 
