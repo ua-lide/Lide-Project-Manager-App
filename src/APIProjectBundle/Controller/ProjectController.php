@@ -78,8 +78,18 @@ class ProjectController extends Controller
 
     /**
      * @Rest\Delete("/api/project/{idProject}")
+     * @Rest\View(
+     *     statusCode = 200
+     * )
      */
-    public function deleteProject() {
+    public function deleteProject(Request $request) {
+        $projectRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Project');
+        $projet = $projectRepository->find($request->get('idProject'));
 
+        if (empty($projet)) {
+            return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
+        } else {
+            $projectRepository->deleteProject($projet);
+        }
     }
 }
