@@ -12,6 +12,33 @@ use Symfony\Component\HttpFoundation\Response;
 class FichierController extends Controller {
 
     /**
+     * @Rest\Put("/api/projet/{idProject}/files/{idFile}")
+     * @Rest\View(
+     *     statusCode = 200
+     * )
+     */
+    public function setFile(Request $request) {
+        $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+            ->find($request->get('idFile'));
+
+        if (empty($file)) {
+            return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm($file);
+        $form->submit($request);
+
+        if ($form->isValid()) {
+            $this->getDoctrine()->getManager()->persist($file);
+            $this->getDoctrine()->getManager()->flush();
+
+            return $file;
+        } else {
+            return new JsonResponse(['message' => 'Données invalides'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    /**
      * @Rest\Delete("/api/project/{idProject}/files{idFile}")
      * @Rest\View(
      *     statusCode = 200
