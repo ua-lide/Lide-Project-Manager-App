@@ -71,9 +71,27 @@ class ProjectController extends Controller
 
     /**
      * @Rest\Put("/api/project/{idProject}")
+     * @Rest\View(
+     *     statusCode = 200
+     * )
      */
-    public function setProject() {
+    public function setProject(Request $request) {
+        $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
+            ->find($request->get('idProject'));
 
+        if (empty($projet)) {
+            return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm($projet);
+        $form->submit($request);
+
+        if ($form->isValid()) {
+            $this->getDoctrine()->getManager()->persist($projet);
+            $this->getDoctrine()->getManager()->flush();
+
+            return $projet;
+        }
     }
 
     /**
