@@ -2,6 +2,7 @@
 
 namespace APIProjectBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -70,6 +71,13 @@ class Projet
      * @ORM\Column(name="updated_at", type="datetime", option={"default": 0})
      */
     private $updated_at;
+
+    /**
+     * @var Collection|Fichier[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Fichier", mappedBy="project")
+     */
+    private $fichiers;
 
 
     /**
@@ -192,6 +200,33 @@ class Projet
         $this->updated_at = $updated_at;
     }
 
+    /**
+     * @return Collection|Fichier[]
+     */
+    public function getFichiers() {
+        return $this->fichiers;
+    }
 
+    /**
+     * @param Fichier $fichier
+     */
+    public function addFichier(Fichier $fichier) {
+        if (!$this->fichiers->contains($fichier)) {
+            $this->fichiers[] = $fichier;
+            $fichier->setProject($this);
+        }
+    }
+
+    /**
+     * @param Fichier $fichier
+     */
+    public function removeFichier(Fichier $fichier) {
+        if ($this->fichiers->contains($fichier)) {
+            $this->fichiers->removeElement($fichier);
+            if ($fichier->getProject() === $this) {
+                $fichier->setProject(null);
+            }
+        }
+    }
 
 }

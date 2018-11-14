@@ -30,6 +30,13 @@ class Fichier
     private $name;
 
     /**
+     * @var Projet
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Projet", inversedBy="fichiers")
+     */
+    private $project;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="path", type="string")
@@ -74,6 +81,20 @@ class Fichier
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return Projet
+     */
+    public function getProject() {
+        return $this->project;
+    }
+
+    /**
+     * @param Projet $project
+     */
+    public function setProject($project) {
+        $this->project = $project;
     }
 
     /**
