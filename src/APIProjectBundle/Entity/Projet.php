@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="projet")
  * @ORM\Entity(repositoryClass="APIProjectBundle\Repository\ProjetRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Projet
 {
@@ -26,9 +27,9 @@ class Projet
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string")
+     * @ORM\Column(name="project_name", type="string")
      */
-    private $name;
+    private $project_name;
 
     /**
      * @var int
@@ -47,37 +48,37 @@ class Projet
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_public", type="boolean", option={"default": false})
+     * @ORM\Column(name="is_public", type="boolean", options={"default": false})
      */
     private $is_public;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_archived", type="boolean", option={"default": false})
+     * @ORM\Column(name="is_archived", type="boolean", options={"default": false})
      */
     private $is_archived;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="createad_at", type="datetime", option={"default": 0})
+     * @ORM\Column(name="created_at", type="datetime")
      */
     private $created_at;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updated_at", type="datetime", option={"default": 0})
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     private $updated_at;
 
-    /**
-     * @var Collection|Fichier[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Fichier", mappedBy="project")
-     */
-    private $fichiers;
+//    /**
+//     * @var Collection|Fichier[]
+//     *
+//     * @ORM\OneToMany(targetEntity="Fichier", mappedBy="project")
+//     */
+//    private $fichiers;
 
 
     /**
@@ -91,17 +92,17 @@ class Projet
     /**
      * @return string
      */
-    public function getName()
+    public function getProjectName()
     {
-        return $this->name;
+        return $this->project_name;
     }
 
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setProjectName($name)
     {
-        $this->name = $name;
+        $this->project_name = $name;
     }
 
     /**
@@ -177,11 +178,13 @@ class Projet
     }
 
     /**
-     * @param \DateTime $created_at
+     * @ORM\PrePersist
      */
-    public function setCreatedAt($created_at)
+    public function setCreatedAt()
     {
-        $this->created_at = $created_at;
+        if (!$this->created_at) {
+            $this->created_at = new \DateTime();
+        }
     }
 
     /**
@@ -200,33 +203,33 @@ class Projet
         $this->updated_at = $updated_at;
     }
 
-    /**
-     * @return Collection|Fichier[]
-     */
-    public function getFichiers() {
-        return $this->fichiers;
-    }
-
-    /**
-     * @param Fichier $fichier
-     */
-    public function addFichier(Fichier $fichier) {
-        if (!$this->fichiers->contains($fichier)) {
-            $this->fichiers[] = $fichier;
-            $fichier->setProject($this);
-        }
-    }
-
-    /**
-     * @param Fichier $fichier
-     */
-    public function removeFichier(Fichier $fichier) {
-        if ($this->fichiers->contains($fichier)) {
-            $this->fichiers->removeElement($fichier);
-            if ($fichier->getProject() === $this) {
-                $fichier->setProject(null);
-            }
-        }
-    }
+//    /**
+//     * @return Collection|Fichier[]
+//     */
+//    public function getFichiers() {
+//        return $this->fichiers;
+//    }
+//
+//    /**
+//     * @param Fichier $fichier
+//     */
+//    public function addFichier(Fichier $fichier) {
+//        if (!$this->fichiers->contains($fichier)) {
+//            $this->fichiers[] = $fichier;
+//            $fichier->setProject($this);
+//        }
+//    }
+//
+//    /**
+//     * @param Fichier $fichier
+//     */
+//    public function removeFichier(Fichier $fichier) {
+//        if ($this->fichiers->contains($fichier)) {
+//            $this->fichiers->removeElement($fichier);
+//            if ($fichier->getProject() === $this) {
+//                $fichier->setProject(null);
+//            }
+//        }
+//    }
 
 }
