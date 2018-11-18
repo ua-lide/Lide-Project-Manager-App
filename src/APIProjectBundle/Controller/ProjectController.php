@@ -80,6 +80,14 @@ class ProjectController extends Controller
 
         if (empty($name) && empty($user_id)) {
             $projects = $projectRepository->findAll();
+        } else if (empty($name)) {
+            $projects = $projectRepository->findBy(
+                array('user_id' => $user_id)
+            );
+        } else if (empty($user_id)) {
+            $projects = $projectRepository->findBy(
+                array('project_name' => $name)
+            );
         } else {
             $projects = $projectRepository->findBy(
                 array('project_name'=>$name, 'user_id'=>$user_id)
