@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="fichier")
  * @ORM\Entity(repositoryClass="APIProjectBundle\Repository\FichierRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Fichier
 {
@@ -25,14 +26,14 @@ class Fichier
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string")
+     * @ORM\Column(name="file_name", type="string")
      */
-    private $name;
+    private $file_name;
 
     /**
      * @var Projet
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Projet", inversedBy="fichiers")
+     * @ORM\ManyToOne(targetEntity="Projet", inversedBy="fichiers")
      */
     private $project;
 
@@ -53,7 +54,7 @@ class Fichier
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updated_at", type="date")
+     * @ORM\Column(name="updated_at", type="date", nullable = true)
      */
     private $updated_at;
 
@@ -70,17 +71,17 @@ class Fichier
     /**
      * @return string
      */
-    public function getName()
+    public function getFileName()
     {
-        return $this->name;
+        return $this->file_name;
     }
 
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setFileName($name)
     {
-        $this->name = $name;
+        $this->file_name = $name;
     }
 
     /**
@@ -122,11 +123,13 @@ class Fichier
     }
 
     /**
-     * @param \DateTime $created_at
+     * @ORM\PrePersist
      */
-    public function setCreatedAt($created_at)
+    public function setCreatedAt()
     {
-        $this->created_at = $created_at;
+        if (!$this->created_at) {
+            $this->created_at = new \DateTime();
+        }
     }
 
     /**
