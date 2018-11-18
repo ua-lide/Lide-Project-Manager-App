@@ -5,3 +5,6 @@ docker_manager:
 app:
     resource: '@AppBundle/Controller/'
     type: annotation
+api:
+    resource: '@APIProjectBundle/Controller/'
+    type: rest
