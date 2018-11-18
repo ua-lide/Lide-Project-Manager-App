@@ -8,6 +8,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use APIProjectBundle\Controller\CreateProjectJob;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,27 +22,38 @@ class ProjectController extends Controller
      * @Rest\View(
      *     statusCode = 200
      * )
-     * @ParamConverter("projet", converter="fos_rest.request_body")
      */
-    public function createProject(Projet $projet) {
+    public function createProjectAction(Request $request) {
+        $body = json_decode($request->getContent(), true);
+
+        $projet = new Projet();
+        $projet->setProjectName($body['name']);
+        $projet->setEnvironnementId($body['environnement_id']);
+        //TODO: récupérer le user
+        $projet->setUserId(1);
+        if (empty($body['is_public'])) {
+            $projet->setIsPublic(false);
+        } else {
+            $projet->setIsPublic($body['is_public']);
+        }
 
         $em = $this->getDoctrine()->getManager();
 
         $em->persist($projet);
         $em->flush();
 
-        $job = new CreateProjectJob($projet);
-        $job->handle();
+//        $job = new CreateProjectJob($projet);
+//        $job->handle();
 
         return $projet;
 
     }
 
     /**
-     * @Rest\Get("/api/project/{idProject}/")
+     * @Rest\Get("/api/project/{idProject}")
      * @Rest\View()
      */
-    public function getProject(Request $request) {
+    public function getProjectAction(Request $request) {
         $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
             ->find($request->get('idProject'));
 
@@ -55,16 +67,28 @@ class ProjectController extends Controller
     /**
      * @Rest\Get("/api/projects")
      * @Rest\View()
-     * @Rest\QueryParam(name="name")
-     * @Rest\QueryParam(name="user")
-     * @Rest\QueryParam(name="page")
+     *
+     * @Rest\QueryParam(name="name", nullable=true)
+     * @Rest\QueryParam(name="user_id", nullable=true)
+     * @Rest\QueryParam(name="page", nullable=true)
      */
-    public function getProjects(ParamFetcherInterface $paramFetcher) {
-        $projects = $this->getDoctrine()->getRepository('APIProjectBundle:Project')
-            ->findBy(
-                array('name'=>$paramFetcher->get('name')),
-                array('user_id'=>$paramFetcher->get('user'))
+    public function getProjectsAction(ParamFetcherInterface $paramFetcher) {
+        $name = $paramFetcher->get('name');
+        $user_id = $paramFetcher->get('user_id');
+
+        $projectRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Projet');
+
+        if (empty($name) && empty($user_id)) {
+            $projects = $projectRepository->findAll();
+        } else {
+            $projects = $projectRepository->findBy(
+                array('project_name'=>$name, 'user_id'=>$user_id)
             );
+        }
+
+        if (empty($projects)) {
+            return new JsonResponse(['message' => 'Projects not found'], Response::HTTP_NOT_FOUND);
+        }
 
         return $projects;
     }
@@ -75,7 +99,7 @@ class ProjectController extends Controller
      *     statusCode = 200
      * )
      */
-    public function setProject(Request $request) {
+    public function setProjectAction(Request $request) {
         $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
             ->find($request->get('idProject'));
 
@@ -100,8 +124,8 @@ class ProjectController extends Controller
      *     statusCode = 200
      * )
      */
-    public function deleteProject(Request $request) {
-        $projectRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Project');
+    public function deleteProjectAction(Request $request) {
+        $projectRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Projet');
         $projet = $projectRepository->find($request->get('idProject'));
 
         if (empty($projet)) {
