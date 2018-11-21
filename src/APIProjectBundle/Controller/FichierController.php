@@ -23,7 +23,26 @@ class FichierController extends Controller {
             return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
         }
 
+        if ($file->getProject()->getId()!=$request->get('idProject')) {
+            return new JsonResponse(['message'=>'Le fichier n\'appartient pas au projet specifie'], Response::HTTP_NOT_FOUND);
+        }
+
         return $file;
+    }
+
+    /**
+     * @Rest\Get("/api/project/{idProject}/files")
+     * @Rest\View()
+     */
+    public function getFilesAction(Request $request) {
+        $files = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+            ->findBy(array('project'=>$request->get('idProject')));
+
+        if (empty($files)) {
+            return new JsonResponse(['message' => 'Files not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $files;
     }
 
     /**
