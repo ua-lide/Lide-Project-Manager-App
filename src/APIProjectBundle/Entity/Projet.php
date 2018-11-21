@@ -178,9 +178,10 @@ class Projet
     }
 
     /**
+     * @param \DateTime $created_at
      * @ORM\PrePersist
      */
-    public function setCreatedAt()
+    public function setCreatedAt($created_at)
     {
         if (!$this->created_at) {
             $this->created_at = new \DateTime();

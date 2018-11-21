@@ -67,4 +67,18 @@ class ProjectControllerTest extends WebTestCase {
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
         $this->assertContains('Projects not found', $client->getResponse()->getContent());
     }
+
+    public function testSetProject() {
+        $client = static::createClient();
+        $client->request('PUT',
+            '/api/project/1',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"project_name":"newname"}'
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains('"projectName":"newname"', $client->getResponse()->getContent());
+    }
 }

@@ -4,6 +4,7 @@ namespace APIProjectBundle\Controller;
 
 
 use APIProjectBundle\Entity\Projet;
+use APIProjectBundle\Form\ProjetType;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -108,6 +109,7 @@ class ProjectController extends Controller
      * )
      */
     public function setProjectAction(Request $request) {
+
         $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
             ->find($request->get('idProject'));
 
@@ -115,15 +117,15 @@ class ProjectController extends Controller
             return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $form = $this->createForm($projet);
-        $form->submit($request);
+        $form = $this->createForm(ProjetType::class, $projet, array('method' => 'PUT'));
 
-        if ($form->isValid()) {
-            $this->getDoctrine()->getManager()->persist($projet);
-            $this->getDoctrine()->getManager()->flush();
+        $form->submit($request->request->all(), false);
 
-            return $projet;
-        }
+        // $form est toujours null mais les données sont bien maj dans $projet, une donnée invalide n'étant pas ajoutée
+        $projet->setUpdatedAt(new \DateTime());
+        $this->getDoctrine()->getManager()->flush();
+
+        return $projet;
     }
 
     /**
