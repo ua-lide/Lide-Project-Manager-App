@@ -12,10 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 class FichierController extends Controller {
 
     /**
-     * @Rest\Get("/api/projet/{idProject}/files/{idFile}")
+     * @Rest\Get("/api/project/{idProject}/files/{idFile}")
      * @Rest\View()
      */
-    public function getFile(Request $request) {
+    public function getFileAction(Request $request) {
         $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
             ->find($request->get('idFile'));
 
@@ -27,12 +27,12 @@ class FichierController extends Controller {
     }
 
     /**
-     * @Rest\Put("/api/projet/{idProject}/files/{idFile}")
+     * @Rest\Put("/api/project/{idProject}/files/{idFile}")
      * @Rest\View(
      *     statusCode = 200
      * )
      */
-    public function setFile(Request $request) {
+    public function setFileAction(Request $request) {
         $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
             ->find($request->get('idFile'));
 
@@ -59,7 +59,7 @@ class FichierController extends Controller {
      *     statusCode = 200
      * )
      */
-    public function deleteFile(Request $request) {
+    public function deleteFileAction(Request $request) {
         $fileRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier');
         $file = $fileRepository->find($request->get('idFile'));
 
