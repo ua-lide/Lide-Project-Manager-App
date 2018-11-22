@@ -3,6 +3,7 @@
 namespace APIProjectBundle\Controller;
 
 
+use APIProjectBundle\Entity\Fichier;
 use APIProjectBundle\Entity\Projet;
 use APIProjectBundle\Form\ProjetType;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -30,6 +31,7 @@ class ProjectController extends Controller
         $projet = new Projet();
         $projet->setProjectName($body['name']);
         $projet->setEnvironnementId($body['environnement_id']);
+
         //TODO: récupérer le user
         $projet->setUserId(1);
         if (empty($body['is_public'])) {
@@ -135,13 +137,25 @@ class ProjectController extends Controller
      * )
      */
     public function deleteProjectAction(Request $request) {
-        $projectRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Projet');
-        $projet = $projectRepository->find($request->get('idProject'));
+        $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
+            ->find($request->get('idProject'));
 
         if (empty($projet)) {
             return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
-        } else {
-            $projectRepository->deleteProject($projet);
         }
+
+        $files = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+            ->findBy(array('project'=>$request->get('idProject')));
+
+        $em = $this->getDoctrine()->getManager();
+
+        // TODO: transaction pour vérifier la suppression dans le systeme de fichiers
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                $em->remove($file);
+            }
+        }
+        $em->remove($projet);
+        $em->flush();
     }
 }

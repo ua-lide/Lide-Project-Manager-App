@@ -79,14 +79,17 @@ class FichierController extends Controller {
      * )
      */
     public function deleteFileAction(Request $request) {
-        $fileRepository = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier');
-        $file = $fileRepository->find($request->get('idFile'));
+        $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+            ->find($request->get('idFile'));
 
         if (empty($file)) {
             return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
-        } else {
-            $fileRepository->deleteFile($file);
         }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->remove($file);
+        $em->flush();
     }
 
 }
