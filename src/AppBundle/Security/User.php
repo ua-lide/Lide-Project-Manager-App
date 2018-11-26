@@ -16,16 +16,20 @@ final class User implements JWTUserInterface
 
     private $roles;
     private $username;
+    private $id;
 
-    public function __construct($username, array $roles)
+    public function __construct($id, $username, array $roles)
     {
         $this->username = $username;
         $this->roles = $roles;
+        $this->id = $id;
     }
 
     public static function createFromPayload($username, array $payload)
     {
+        dump($payload);
         return new self(
+            $payload['id'],
             $username,
             $payload['roles'] // Added by default
         );
