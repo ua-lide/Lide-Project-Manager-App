@@ -70,3 +70,6 @@ swiftmailer:
 sensio_framework_extra:
    router:
         annotations: false
+
+lexik_jwt_authentication:
+    public_key:       '%kernel.project_dir%/config/jwt/public.pem'  # required for token verification

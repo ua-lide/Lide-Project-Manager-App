@@ -3,11 +3,17 @@
 namespace DockerManagerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DefaultController extends Controller
 {
     public function indexAction()
     {
-        return $this->render('DockerManagerBundle:Default:index.html.twig');
+        // replace this example code with whatever you need
+        dump($this->getUser());
+        die();
+        return new JsonResponse([
+            'user' => $this->getUser()
+        ]);
     }
 }
