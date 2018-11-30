@@ -3,13 +3,28 @@
 namespace Tests\APIProjectBundle\Controller;
 
 
+use AppBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ProjectControllerTest extends WebTestCase {
 
 
-    public function testGetExistingProject() {
+    public static function createAuthentificatedAdminClient(){
+
+        $user = new User(1, 'admin', ['ROLE_ADMIN', 'ROLE_USER']);
+
         $client = static::createClient();
+        $jwtAuth = $client->getContainer()->get('lexik_jwt_authentication.jwt_manager');
+        $token = $jwtAuth->create($user);
+
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $token));
+
+        return $client;
+    }
+
+    public function testGetExistingProject() {
+        $client = static::createAuthentificatedAdminClient();
         $client->request('GET', '/api/project/1');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
