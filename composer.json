@@ -5,7 +5,8 @@
     "autoload": {
         "psr-4": {
             "AppBundle\\": "src/AppBundle",
-            "APIProjectBundle\\": "src/APIProjectBundle"
+            "APIProjectBundle\\": "src/APIProjectBundle",
+            "DockerManagerBundle\\": "src/DockerManagerBundle"
         },
         "classmap": [
             "app/AppKernel.php",
@@ -21,11 +22,13 @@
         ]
     },
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=7.2",
+        "cboden/ratchet": "^0.4.1",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/orm": "^2.5",
         "friendsofsymfony/rest-bundle": "^2.4",
         "incenteev/composer-parameter-handler": "^2.0",
+        "lexik/jwt-authentication-bundle": "^2.6",
         "sensio/distribution-bundle": "^5.0.19",
         "sensio/framework-extra-bundle": "^5.0.0",
         "symfony/monolog-bundle": "^3.1.0",

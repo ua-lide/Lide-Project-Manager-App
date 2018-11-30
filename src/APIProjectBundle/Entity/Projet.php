@@ -48,14 +48,14 @@ class Projet
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_public", type="boolean", options={"default": false})
+     * @ORM\Column(name="is_public", type="boolean")
      */
     private $is_public;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_archived", type="boolean", options={"default": false})
+     * @ORM\Column(name="is_archived", type="boolean")
      */
     private $is_archived;
 
@@ -72,14 +72,6 @@ class Projet
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     private $updated_at;
-
-//    /**
-//     * @var Collection|Fichier[]
-//     *
-//     * @ORM\OneToMany(targetEntity="Fichier", mappedBy="project")
-//     */
-//    private $fichiers;
-
 
     /**
      * @return int
@@ -142,15 +134,20 @@ class Projet
      */
     public function isPublic()
     {
-        return $this->is_public;
+        return (boolean)$this->is_public;
     }
 
     /**
      * @param bool $is_public
+     * @ORM\PrePersist
      */
     public function setIsPublic($is_public)
     {
-        $this->is_public = $is_public;
+        if (!empty($is_public)) {
+            $this->is_public = $is_public;
+        } else {
+            $this->is_public = false;
+        }
     }
 
     /**
@@ -158,15 +155,20 @@ class Projet
      */
     public function isArchived()
     {
-        return $this->is_archived;
+        return (boolean)$this->is_archived;
     }
 
     /**
      * @param bool $is_archived
+     * @ORM\PrePersist
      */
     public function setIsArchived($is_archived)
     {
-        $this->is_archived = $is_archived;
+        if (!empty($is_archived)) {
+            $this->is_archived = $is_archived;
+        } else {
+            $this->is_archived = false;
+        }
     }
 
     /**
@@ -203,34 +205,5 @@ class Projet
     {
         $this->updated_at = $updated_at;
     }
-
-//    /**
-//     * @return Collection|Fichier[]
-//     */
-//    public function getFichiers() {
-//        return $this->fichiers;
-//    }
-//
-//    /**
-//     * @param Fichier $fichier
-//     */
-//    public function addFichier(Fichier $fichier) {
-//        if (!$this->fichiers->contains($fichier)) {
-//            $this->fichiers[] = $fichier;
-//            $fichier->setProject($this);
-//        }
-//    }
-//
-//    /**
-//     * @param Fichier $fichier
-//     */
-//    public function removeFichier(Fichier $fichier) {
-//        if ($this->fichiers->contains($fichier)) {
-//            $this->fichiers->removeElement($fichier);
-//            if ($fichier->getProject() === $this) {
-//                $fichier->setProject(null);
-//            }
-//        }
-//    }
 
 }
