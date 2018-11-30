@@ -25,4 +25,12 @@ class ProjetService {
         $projectPath = $this->filesystemPath. '/'. $projet->getUserId().'/'.$projet->getId();
         $this->filesystem->mkdir($projectPath);
     }
+
+    /**
+     * @param Projet $projet
+     */
+    public function  deleteProjectFileSystem($projet) {
+        $projectPath = $this->filesystemPath. '/'. $projet->getUserId().'/'.$projet->getId();
+        $this->filesystem->remove($projectPath);
+    }
 }

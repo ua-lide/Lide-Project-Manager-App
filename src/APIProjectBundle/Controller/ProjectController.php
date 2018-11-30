@@ -53,7 +53,6 @@ class ProjectController extends Controller
             $filesystem = $this->container->getParameter('root_users_filesystem');
             $projetService = new ProjetService($filesystem);
 
-
             $em->flush();
 
             $projetService->createProjectFileSystem($projet);
@@ -62,9 +61,9 @@ class ProjectController extends Controller
 
             return $projet;
 
-        } catch (\Exception $err) {
+        } catch (\Exception $exception) {
             $conn->rollback();
-            return new JsonResponse(['message' => 'Erreur lors de la creation du projet', $err->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['message' => 'Erreur lors de la creation du projet', $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -154,25 +153,42 @@ class ProjectController extends Controller
      * )
      */
     public function deleteProjectAction(Request $request) {
-        $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
-            ->find($request->get('idProject'));
 
-        if (empty($projet)) {
-            return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
-        }
+        $conn = $this->getDoctrine()->getConnection();
+        $conn->beginTransaction();
+        $conn->setAutoCommit(false);
 
-        $files = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
-            ->findBy(array('project' => $request->get('idProject')));
+        try {
+            $projet = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
+                ->find($request->get('idProject'));
 
-        $em = $this->getDoctrine()->getManager();
-
-        // TODO: transaction pour vérifier la suppression dans le systeme de fichiers
-        if (!empty($files)) {
-            foreach ($files as $file) {
-                $em->remove($file);
+            if (empty($projet)) {
+                return new JsonResponse(['message' => 'Project not found'], Response::HTTP_NOT_FOUND);
             }
+
+            $files = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+                ->findBy(array('project' => $request->get('idProject')));
+
+            $em = $this->getDoctrine()->getManager();
+
+            if (!empty($files)) {
+                foreach ($files as $file) {
+                    $em->remove($file);
+                }
+            }
+
+            $filesystem = $this->container->getParameter('root_users_filesystem');
+            $projetService = new ProjetService($filesystem);
+            $projetService->deleteProjectFileSystem($projet);
+
+            $em->remove($projet);
+            $em->flush();
+
+            $conn->commit();
+
+        } catch (\Exception $exception) {
+            $conn->rollback();
+            return new JsonResponse(['message' => 'Erreur lors de la suppression du projet', $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        $em->remove($projet);
-        $em->flush();
     }
 }
