@@ -29,7 +29,7 @@ class Projet
      *
      * @ORM\Column(name="project_name", type="string")
      */
-    private $project_name;
+    private $name;
 
     /**
      * @var int
@@ -84,17 +84,17 @@ class Projet
     /**
      * @return string
      */
-    public function getProjectName()
+    public function getName()
     {
-        return $this->project_name;
+        return $this->name;
     }
 
     /**
      * @param string $name
      */
-    public function setProjectName($name)
+    public function setName($name)
     {
-        $this->project_name = $name;
+        $this->name = $name;
     }
 
     /**

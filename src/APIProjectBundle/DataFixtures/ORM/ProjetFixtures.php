@@ -12,7 +12,7 @@ class ProjetFixtures extends Fixture {
 
         $projet1 = new Projet();
 
-        $projet1->setProjectName("projet1");
+        $projet1->setName("projet1");
         $projet1->setUserId(1);
         $projet1->setEnvironnementId(1);
         $projet1->setIsPublic(true);
@@ -24,7 +24,7 @@ class ProjetFixtures extends Fixture {
 
         $projet2 = new Projet();
 
-        $projet2->setProjectName("projet2");
+        $projet2->setName("projet2");
         $projet2->setUserId(2);
         $projet2->setEnvironnementId(2);
         $projet2->setIsPublic(true);

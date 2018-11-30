@@ -41,7 +41,7 @@ class ProjectController extends Controller
 
             // le nom d'un projet est unique par utilisateur
             if (!empty($this->getDoctrine()->getRepository('APIProjectBundle:Projet')
-                ->findBy(array('project_name' => $projet->getProjectName(),
+                ->findBy(array('project_name' => $projet->getName(),
                     'user_id' => $projet->getUserId())))) {
                 throw new \Exception("Le projet existe deja");
             }
