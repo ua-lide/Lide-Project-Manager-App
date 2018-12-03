@@ -16,7 +16,7 @@ class ProjetType extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
-            ->add('project_name', TextType::class, array('required'=>false))
+            ->add('name', TextType::class, array('required'=>false))
             ->add('user_id', IntegerType::class, array('required'=>false))
             ->add('environnement_id', IntegerType::class, array('required'=>false))
             ->add('is_public',CheckboxType::class, array('required'=>false))
