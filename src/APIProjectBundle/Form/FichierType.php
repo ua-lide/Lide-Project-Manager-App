@@ -15,7 +15,7 @@ class FichierType extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
-            ->add('file_name', TextType::class, array('required'=>false))
+            ->add('name', TextType::class, array('required'=>false))
             ->add('path', TextType::class, array('required'=>false))
             ->add('created_at', DateTimeType::class, array('required'=>false))
             ->add('updated_at', DateTimeType::class, array('required'=>false))

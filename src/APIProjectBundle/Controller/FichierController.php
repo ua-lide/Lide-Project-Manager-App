@@ -80,7 +80,7 @@ class FichierController extends Controller {
                 return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
             }
 
-            $oldPath = $file->getPath() . '/' . $file->getFileName();
+            $oldPath = $file->getPath() . '/' . $file->getName();
 
             $form = $this->createForm(FichierType::class, $file, array('method' => 'PUT'));
             $form->submit($request->request->all(), false);

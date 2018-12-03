@@ -27,7 +27,7 @@ class FichierService {
      * Supprime le fichier $fichier du systeme de fichier
      */
     public function  deleteFile($fichier, $userId, $projetId) {
-        $filePath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src/'. $fichier->getPath(). '/'. $fichier->getFileName();
+        $filePath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src/'. $fichier->getPath(). '/'. $fichier->getName();
         $this->filesystem->remove($filePath);
     }
 
@@ -39,7 +39,7 @@ class FichierService {
      * @return String :le contenu du fichier $fichier
      */
     public function getFileContent($fichier, $userId, $projetId) {
-        $filePath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src/'. $fichier->getPath(). '/'. $fichier->getFileName();
+        $filePath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src/'. $fichier->getPath(). '/'. $fichier->getName();
         if ($this->filesystem->exists($filePath)) {
             $content = file_get_contents($filePath);
         } else {
@@ -66,10 +66,10 @@ class FichierService {
             $this->filesystem->mkdir($filePath);
         }
 
-        $this->filesystem->rename($oldPath, $filePath.$fichier->getFileName());
+        $this->filesystem->rename($oldPath, $filePath.$fichier->getName());
 
         if (!empty($content)) {
-            $this->filesystem->dumpFile($filePath.$fichier->getFileName(), $content);
+            $this->filesystem->dumpFile($filePath.$fichier->getName(), $content);
         }
     }
 

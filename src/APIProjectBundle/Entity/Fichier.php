@@ -28,7 +28,7 @@ class Fichier
      *
      * @ORM\Column(name="file_name", type="string")
      */
-    private $file_name;
+    private $name;
 
     /**
      * @var Projet
@@ -71,17 +71,17 @@ class Fichier
     /**
      * @return string
      */
-    public function getFileName()
+    public function getName()
     {
-        return $this->file_name;
+        return $this->name;
     }
 
     /**
      * @param string $name
      */
-    public function setFileName($name)
+    public function setName($name)
     {
-        $this->file_name = $name;
+        $this->name = $name;
     }
 
     /**
