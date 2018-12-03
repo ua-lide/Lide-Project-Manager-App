@@ -3,6 +3,7 @@
 namespace APIProjectBundle\Controller;
 
 
+use APIProjectBundle\Form\FichierType;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -52,7 +53,7 @@ class FichierController extends Controller {
             ->findBy(array('project'=>$request->get('idProject')));
 
         if (empty($files)) {
-            return new JsonResponse(['message' => 'Files not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['message' => 'No files'], Response::HTTP_OK);
         }
 
         return $files;
@@ -65,23 +66,48 @@ class FichierController extends Controller {
      * )
      */
     public function setFileAction(Request $request) {
-        $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
-            ->find($request->get('idFile'));
 
-        if (empty($file)) {
-            return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
-        }
+        $conn = $this->getDoctrine()->getConnection();
+        $conn->beginTransaction();
+        $conn->setAutoCommit(false);
 
-        $form = $this->createForm($file);
-        $form->submit($request);
+        try {
 
-        if ($form->isValid()) {
-            $this->getDoctrine()->getManager()->persist($file);
+            $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+                ->find($request->get('idFile'));
+
+            if (empty($file)) {
+                return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $oldPath = $file->getPath() . '/' . $file->getFileName();
+
+            $form = $this->createForm(FichierType::class, $file, array('method' => 'PUT'));
+            $form->submit($request->request->all(), false);
+
+            $file->setUpdatedAt(new \DateTime());
+
+            if (!empty($request->get('content'))) {
+                $content = $request->get('content');
+            } else {
+                $content = null;
+            }
+
+            $filesystem = $this->container->getParameter('root_users_filesystem');
+            $fichierService = new FichierService($filesystem);
+            $fichierService->setFile($file, $this->getUser()->getId(), $request->get('idProject'), $content, $oldPath);
+
+            // $form est toujours null mais les données sont bien maj dans $file, une donnée invalide n'étant pas ajoutée
+            // donc $form->isValid() renvoie toujours faux
             $this->getDoctrine()->getManager()->flush();
 
+            $conn->commit();
+
             return $file;
-        } else {
-            return new JsonResponse(['message' => 'Données invalides'], Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        } catch (\Exception $exception) {
+            $conn->rollback();
+            return new JsonResponse(['message' => 'Erreur lors de la modification du fichier', 'erreur' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -19,14 +19,6 @@ class FichierService {
         }
     }
 
-//    /**
-//     * @param Projet $projet
-//     */
-//    public function createProjectFileSystem($projet) {
-//        $projectPath = $this->filesystemPath. '/'. $projet->getUserId().'/'.$projet->getId();
-//        $this->filesystem->mkdir($projectPath);
-//    }
-
     /**
      * @param Fichier $fichier
      * @param $userId
@@ -54,6 +46,31 @@ class FichierService {
             $content = "No content";
         }
         return $content;
+    }
+
+    /**
+     * @param Fichier $fichier
+     * @param $userId
+     * @param $projetId
+     * @param String $content
+     * @param String $oldPath
+     *
+     * Modifie le contenu du fichier $fichier
+     */
+    public function setFile($fichier, $userId, $projetId, $content, $path) {
+        $oldPath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src'. $path;
+        $filePath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src'. $fichier->getPath(). '/';
+
+        // la méthode rename ne fonctionne pas si le répertoire n'existe pas
+        if (!$this->filesystem->exists($filePath)) {
+            $this->filesystem->mkdir($filePath);
+        }
+
+        $this->filesystem->rename($oldPath, $filePath.$fichier->getFileName());
+
+        if (!empty($content)) {
+            $this->filesystem->dumpFile($filePath.$fichier->getFileName(), $content);
+        }
     }
 
 }
