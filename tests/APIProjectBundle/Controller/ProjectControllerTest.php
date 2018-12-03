@@ -14,11 +14,9 @@ class ProjectControllerTest extends WebTestCase {
         $client->request('GET', '/api/project/1');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        dump($client->getResponse()->getContent());
     }
 
     public function testGetNonExistingProject() {
-        $x = static::createClient();
         $client = static::createAuthentificatedAdminClient();
         $client->request('GET', '/api/project/1564');
 
@@ -82,5 +80,21 @@ class ProjectControllerTest extends WebTestCase {
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains('"projectName":"newname"', $client->getResponse()->getContent());
+    }
+
+    public function testCreateProject() {
+        $client = static::createAuthentificatedAdminClient();
+        $client->request('POST',
+            '/api/project',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"project_name":"testname1",
+            "environnement_id":"1",
+            "is_public":"true"}'
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains('"projectName":"testname1"', $client->getResponse()->getContent());
     }
 }
