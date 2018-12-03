@@ -75,7 +75,7 @@ class ProjectControllerTest extends WebTestCase {
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            '{"project_name":"newname"}'
+            '{"name":"newname"}'
         );
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -89,7 +89,7 @@ class ProjectControllerTest extends WebTestCase {
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            '{"project_name":"testname1",
+            '{"name":"testname1",
             "environnement_id":"1",
             "is_public":"true"}'
         );

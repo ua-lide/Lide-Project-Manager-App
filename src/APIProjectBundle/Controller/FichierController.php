@@ -52,9 +52,9 @@ class FichierController extends Controller {
         $files = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
             ->findBy(array('project'=>$request->get('idProject')));
 
-        if (empty($files)) {
-            return new JsonResponse(['message' => 'No files'], Response::HTTP_OK);
-        }
+//        if (empty($files)) {
+//            return new JsonResponse(['message' => 'Files not found'], Response::HTTP_NOT_FOUND);
+//        }
 
         return $files;
     }
@@ -112,7 +112,7 @@ class FichierController extends Controller {
     }
 
     /**
-     * @Rest\Delete("/api/project/{idProject}/files{idFile}")
+     * @Rest\Delete("/api/project/{idProject}/files/{idFile}")
      * @Rest\View(
      *     statusCode = 200
      * )
