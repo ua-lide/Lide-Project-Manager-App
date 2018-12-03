@@ -33,16 +33,10 @@ class FichierController extends Controller {
 
         $withContent = $paramFetcher->get('withContent');
         if (($withContent == "0") || ($withContent == "true")) {
-            $filesystem = new Filesystem();
-            $path = $this->container->getParameter('root_users_filesystem')."/".
-                $this->getUser()->getId()."/".
-                $request->get('idProject')."/src/".
-            $file->getPath().$file->getFileName();
-            if ($filesystem->exists($path)) {
-                $content = file_get_contents($path);
-            } else {
-                $content = "No content";
-            }
+            $filesystem = $this->container->getParameter('root_users_filesystem');
+            $fichierService = new FichierService($filesystem);
+            $content = $fichierService->getFileContent($file, $this->getUser()->getId(), $request->get('idProject'));
+
             return array('data'=>$file, 'content'=>$content);
         } else {
             return $file;
@@ -98,17 +92,35 @@ class FichierController extends Controller {
      * )
      */
     public function deleteFileAction(Request $request) {
-        $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
-            ->find($request->get('idFile'));
 
-        if (empty($file)) {
-            return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+        $conn = $this->getDoctrine()->getConnection();
+        $conn->beginTransaction();
+        $conn->setAutoCommit(false);
+
+        try {
+
+            $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+                ->find($request->get('idFile'));
+
+            if (empty($file)) {
+                return new JsonResponse(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $filesystem = $this->container->getParameter('root_users_filesystem');
+            $fichierService = new FichierService($filesystem);
+            $fichierService->deleteFile($file, $this->getUser()->getId(), $request->get('idProject'));
+
+            $em = $this->getDoctrine()->getManager();
+
+            $em->remove($file);
+            $em->flush();
+
+            $conn->commit();
+
+        } catch (\Exception $exception) {
+            $conn->rollback();
+            return new JsonResponse(['message' => 'Erreur lors de la suppression du fichier', 'erreur' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $em = $this->getDoctrine()->getManager();
-
-        $em->remove($file);
-        $em->flush();
     }
 
 }
