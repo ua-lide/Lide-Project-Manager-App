@@ -20,6 +20,7 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new \APIProjectBundle\APIProjectBundle(),
             new FOS\RestBundle\FOSRestBundle(),
+            new Nelmio\CorsBundle\NelmioCorsBundle(),
             new DockerManagerBundle\DockerManagerBundle(),
         ];
 
