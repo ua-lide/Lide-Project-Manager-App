@@ -52,10 +52,6 @@ class FichierController extends Controller {
         $files = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
             ->findBy(array('project'=>$request->get('idProject')));
 
-//        if (empty($files)) {
-//            return new JsonResponse(['message' => 'Files not found'], Response::HTTP_NOT_FOUND);
-//        }
-
         return $files;
     }
 

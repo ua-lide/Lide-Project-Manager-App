@@ -139,8 +139,10 @@ class ProjectController extends Controller
 
         $form->submit($request->request->all(), false);
 
-        // $form est toujours null mais les données sont bien maj dans $projet, une donnée invalide n'étant pas ajoutée
         $projet->setUpdatedAt(new \DateTime());
+
+        // $form est toujours null mais les données sont bien maj dans $projet, une donnée invalide n'étant pas ajoutée
+        // donc $form->isValid() renvoie toujours faux
         $this->getDoctrine()->getManager()->flush();
 
         return $projet;

@@ -17,8 +17,6 @@ class FichierType extends AbstractType {
         $builder
             ->add('name', TextType::class, array('required'=>false))
             ->add('path', TextType::class, array('required'=>false))
-            ->add('created_at', DateTimeType::class, array('required'=>false))
-            ->add('updated_at', DateTimeType::class, array('required'=>false))
         ;
     }
 

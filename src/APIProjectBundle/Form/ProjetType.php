@@ -21,8 +21,6 @@ class ProjetType extends AbstractType {
             ->add('environnement_id', IntegerType::class, array('required'=>false))
             ->add('is_public',CheckboxType::class, array('required'=>false))
             ->add('is_archived', CheckboxType::class, array('required'=>false))
-            ->add('created_at', DateTimeType::class, array('required'=>false))
-            ->add('updated_at', DateTimeType::class, array('required'=>false))
         ;
     }
 
