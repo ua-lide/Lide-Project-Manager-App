@@ -43,7 +43,7 @@ class FichierService {
         if ($this->filesystem->exists($filePath)) {
             $content = file_get_contents($filePath);
         } else {
-            $content = "No content";
+            $content = "";
         }
         return $content;
     }
