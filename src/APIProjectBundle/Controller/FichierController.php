@@ -3,8 +3,10 @@
 namespace APIProjectBundle\Controller;
 
 
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,8 +16,10 @@ class FichierController extends Controller {
     /**
      * @Rest\Get("/api/project/{idProject}/files/{idFile}")
      * @Rest\View()
+     *
+     * @Rest\QueryParam(name="withContent", nullable=true)
      */
-    public function getFileAction(Request $request) {
+    public function getFileAction(Request $request, ParamFetcherInterface $paramFetcher) {
         $file = $this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
             ->find($request->get('idFile'));
 
@@ -27,7 +31,22 @@ class FichierController extends Controller {
             return new JsonResponse(['message'=>'Le fichier n\'appartient pas au projet specifie'], Response::HTTP_NOT_FOUND);
         }
 
-        return $file;
+        $withContent = $paramFetcher->get('withContent');
+        if (($withContent == "0") || ($withContent == "true")) {
+            $filesystem = new Filesystem();
+            $path = $this->container->getParameter('root_users_filesystem')."/".
+                $this->getUser()->getId()."/".
+                $request->get('idProject')."/src/".
+            $file->getPath().$file->getFileName();
+            if ($filesystem->exists($path)) {
+                $content = file_get_contents($path);
+            } else {
+                $content = "No content";
+            }
+            return array('data'=>$file, 'content'=>$content);
+        } else {
+            return $file;
+        }
     }
 
     /**
