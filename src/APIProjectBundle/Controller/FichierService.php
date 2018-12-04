@@ -66,7 +66,9 @@ class FichierService {
             $this->filesystem->mkdir($filePath);
         }
 
-        $this->filesystem->rename($oldPath, $filePath.$fichier->getName());
+        if ($oldPath !== $filePath.$fichier->getName()) {
+            $this->filesystem->rename($oldPath, $filePath . $fichier->getName());
+        }
 
         if (!empty($content)) {
             $this->filesystem->dumpFile($filePath.$fichier->getName(), $content);
