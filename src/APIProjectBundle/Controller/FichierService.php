@@ -73,4 +73,27 @@ class FichierService {
         }
     }
 
+    /**
+     * @param Fichier $fichier
+     * @param $userId
+     * @param $projetId
+     * @param String $content
+     *
+     * Ajoute le fichier $fichier au projet d'id $projetId
+     */
+    public function addFile($fichier, $userId, $projetId, $content) {
+        $filePath = $this->filesystemPath. '/'. $userId. '/'. $projetId. '/src'. $fichier->getPath(). '/';
+
+        // la méthode touch ne fonctionne pas si le répertoire n'existe pas
+        if (!$this->filesystem->exists($filePath)) {
+            $this->filesystem->mkdir($filePath);
+        }
+
+        $this->filesystem->touch($filePath.$fichier->getName());
+
+        if (!empty($content)) {
+            $this->filesystem->dumpFile($filePath.$fichier->getName(), $content);
+        }
+    }
+
 }

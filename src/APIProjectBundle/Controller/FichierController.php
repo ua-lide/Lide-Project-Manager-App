@@ -3,6 +3,7 @@
 namespace APIProjectBundle\Controller;
 
 
+use APIProjectBundle\Entity\Fichier;
 use APIProjectBundle\Form\FichierType;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -104,6 +105,74 @@ class FichierController extends Controller {
         } catch (\Exception $exception) {
             $conn->rollback();
             return new JsonResponse(['message' => 'Erreur lors de la modification du fichier', 'erreur' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @Rest\Post("/api/project/{idProject}/files")
+     * @Rest\View(
+     *     statusCode = 200
+     * )
+     * @param Request $request
+     */
+    public function addFileAction(Request $request) {
+
+        $conn = $this->getDoctrine()->getConnection();
+        $conn->beginTransaction();
+        $conn->setAutoCommit(false);
+
+        try {
+
+            $file = new Fichier();
+
+            $form = $this->createForm(FichierType::class, $file, array('method' => 'POST'));
+            $form->submit($request->request->all(), false);
+
+            $project = $this->getDoctrine()->getRepository('APIProjectBundle:Projet')
+                ->find($request->get('idProject'));
+            if (!empty($project)) {
+                $file->setProject($project);
+            }
+
+            //tous les champs sont requis
+            if (empty($request->get('content'))||empty($request->get('name'))||empty($request->get('path'))) {
+                $conn->rollback();
+                return new JsonResponse(['message' => 'Le formulaire n\'est pas valide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            // le couple (name, path) est unique dans un projet
+            if (!empty($this->getDoctrine()->getRepository('APIProjectBundle:Fichier')
+                ->findBy(array('name' => $file->getName(),
+                    'path' => $file->getPath(),
+                    'project' => $file->getProject())))) {
+                $conn->rollback();
+                return new JsonResponse(['message' => 'Ce fichier existe deja'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            $em = $this->getDoctrine()->getManager();
+
+            $em->persist($file);
+
+            if (!empty($request->get('content'))) {
+                $content = $request->get('content');
+            } else {
+                $content = null;
+            }
+
+            $filesystem = $this->container->getParameter('root_users_filesystem');
+            $fichierService = new FichierService($filesystem);
+
+            $em->flush();
+
+            $fichierService->addFile($file, $this->getUser()->getId(), $request->get('idProject'), $content);
+
+            $conn->commit();
+
+            return $file;
+
+        } catch (\Exception $exception) {
+            $conn->rollback();
+            return new JsonResponse(['message' => 'Erreur lors de l\'ajout du fichier au projet', 'erreur' => $exception->getMessage()]);
         }
     }
 
