@@ -8,10 +8,13 @@
 
 namespace DockerManagerBundle\WebSocketServer;
 
+use DockerManagerBundle\Exceptions\ProcessStoppedException;
+use DockerManagerBundle\WebSocketServer\MessageHandlers\AuthentificationMessageHandler;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\ExecuteMessageHandler;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\ForceStopMessageHandler;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\GetStatusMessageHandler;
 use DockerManagerBundle\WebSocketServer\MessageHandlers\InputMessageHandler;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Guard\JWTTokenAuthenticator;
 use Lide\CommonsBundle\Entity\Environment;
 use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
@@ -73,7 +76,8 @@ class WebSocketServer implements MessageComponentInterface
             ExecuteMessageHandler::$Type => new ExecuteMessageHandler(),
             ForceStopMessageHandler::$Type => new ForceStopMessageHandler(),
             GetStatusMessageHandler::$Type => new GetStatusMessageHandler(),
-            InputMessageHandler::$Type => new InputMessageHandler()
+            InputMessageHandler::$Type => new InputMessageHandler(),
+            AuthentificationMessageHandler::$Type => new AuthentificationMessageHandler(),
         ];
 
         $this->userManagerFactory = $userManagerFactory;
@@ -93,6 +97,8 @@ class WebSocketServer implements MessageComponentInterface
         /** @noinspection PhpUndefinedFieldInspection */
         $this->logger->info("New connection " . $conn->resourceId);
 
+        echo "User connected {$conn->resourceId}\n";
+
         /** @var RequestInterface $request */
         /** @noinspection PhpUndefinedFieldInspection */
         $request = $conn->httpRequest;
@@ -103,7 +109,6 @@ class WebSocketServer implements MessageComponentInterface
         /** @noinspection PhpUndefinedFieldInspection */
         $this->users[$conn->resourceId] = $userManager;
 
-        $conn->send("Connected");
     }
 
     /**
@@ -113,6 +118,7 @@ class WebSocketServer implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $conn)
     {
+        echo "Connection closes {$conn->resourceId}\n";
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
         /** @noinspection PhpUndefinedFieldInspection */
@@ -142,6 +148,8 @@ class WebSocketServer implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
+
+        echo "Message `$msg``\n";
         //Limit to 4 depth because message shouldn't have more
         $messageData = json_decode($msg, true, 4);
 
@@ -160,27 +168,70 @@ class WebSocketServer implements MessageComponentInterface
 
         $type = (string)$messageData['type'];
 
+        if(! $userManager->isAuthentificated() && $type != AuthentificationMessageHandler::$Type){
+            $from->send(json_encode([
+                'type' => 'error',
+                'data' => [ 'message' => 'Need to authenticate first' ]
+            ]));
+            $from->close();
+        }
+
         if (!array_key_exists($type, $this->handlers)) {
+            echo "No handler for message of type \"${type}\"\n";
             return;
         }
         $handler = $this->handlers[$type];
 
-        $handler->handle($userManager, $type, $messageData['data']);
+        $ret = $handler->handle($userManager, $type, $messageData['data']);
+        echo "Retour handler : $ret\n";
+        if($type === AuthentificationMessageHandler::$Type && !$ret){
+            $from->send(json_encode([
+                'type' => 'error',
+                'data' => [ 'message' => 'Auth error' ]
+            ]));
+            $from->close();
+        }
     }
 
     public function retrieveDockerOutput()
     {
         foreach ($this->users as $user) {
-            $out = $user->readOutput();
+            /** @var UserManager $user */
 
-            $response = [];
+            /** @var ProcessManager $processManager */
+            $processManager = $user->getProcessManager();
+            var_dump($processManager);
+            if($processManager != null){
+                try{
+                    $out = $processManager->readOutput(1024);
+                    $err = $processManager->readErrorOutput(1024);
 
-            $response['stdout'] = $out;
-            $response['stderr'] = $user->readStderr();
-            $response['running'] = $user->isContainerRunning();
+                    var_dump($out);
+                    var_dump($err);
 
-            if (!empty($response['stdout']) || !empty($response['stderr'] && !$response['running'])) {
-                $user->getConnection()->send(json_encode($response, JSON_PRETTY_PRINT));
+                    $response = [];
+
+                    $hasOut = false;
+                    if(!empty($out)){
+                        $response['stdout'] = $out;
+                        $hasOut = true;
+                    }
+                    if(!empty($err)){
+                        $response['stderr'] = $err;
+                        $hasOut = true;
+                    }
+
+                    $running = $user->isContainerRunning();
+
+                    if ($hasOut) {
+                        $user->getConnection()->send(json_encode(['type' => 'out', 'data' => $response], JSON_PRETTY_PRINT));
+                    }
+                    if(!$running){
+                        $user->stopContainer();
+                    }
+                }catch (ProcessStoppedException $e){
+                    $user->stopContainer();
+                }
             }
         }
     }

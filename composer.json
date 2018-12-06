@@ -6,7 +6,7 @@
         "psr-4": {
             "AppBundle\\": "src/AppBundle",
             "DockerManagerBundle\\": "src/DockerManagerBundle",
-            "APIProjectBundle\\": "src/APIProjectBundle",
+            "APIProjectBundle\\": "src/APIProjectBundle"
         },
         "classmap": [
             "app/AppKernel.php",
@@ -16,7 +16,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
-            "DockerManagerBundle\\": "src/DockerManagerBundle",
+            "DockerManagerBundle\\": "src/DockerManagerBundle"
         },
         "files": [
             "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php"

@@ -27,7 +27,6 @@ final class User implements JWTUserInterface
 
     public static function createFromPayload($username, array $payload)
     {
-        dump($payload);
         return new self(
             $payload['id'],
             $username,

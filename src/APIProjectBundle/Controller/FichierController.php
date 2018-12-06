@@ -84,7 +84,7 @@ class FichierController extends Controller {
 
             $file->setUpdatedAt(new \DateTime());
 
-            if (!empty($request->get('content'))) {
+            if (!is_null($request->get('content'))) {
                 $content = $request->get('content');
             } else {
                 $content = null;
@@ -135,7 +135,7 @@ class FichierController extends Controller {
             }
 
             //tous les champs sont requis
-            if (empty($request->get('content'))||empty($request->get('name'))||empty($request->get('path'))) {
+            if (is_null($request->get('content'))||empty($request->get('name'))||empty($request->get('path'))) {
                 $conn->rollback();
                 return new JsonResponse(['message' => 'Le formulaire n\'est pas valide'], Response::HTTP_UNPROCESSABLE_ENTITY);
             }

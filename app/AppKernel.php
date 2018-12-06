@@ -22,7 +22,6 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new Nelmio\CorsBundle\NelmioCorsBundle(),
             new DockerManagerBundle\DockerManagerBundle(),
-            new Lide\CommonsBundle\LideCommonsBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

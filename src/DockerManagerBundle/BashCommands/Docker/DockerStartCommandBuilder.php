@@ -22,6 +22,9 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
     private $dockerImageIdentifier;
     private $identifier;
     private $remove;
+    private $withBindMount = false;
+    private $hostPath;
+    private $mountPath;
 
     /**
      * DockerCommandBuilder constructor.
@@ -63,6 +66,10 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
             $builder->addFlagArgument('-m', $this->allocatedMemory);
         }
 
+        if ($this->withBindMount) {
+            $builder->addRawArgument('--mount type=bind,source=' . $this->hostPath . ',destination=' . $this->mountPath);
+        }
+
         $builder->addRawArgument($this->dockerImageIdentifier);
         if ($this->startCommand) {
             $builder->addRawArgument($this->startCommand);
@@ -88,6 +95,14 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
     public function withoutInput()
     {
         $this->inputFlag = false;
+        return $this;
+    }
+
+    public function withBindMount(string $hostPath, string $mountPath)
+    {
+        $this->withBindMount = true;
+        $this->hostPath = $hostPath;
+        $this->mountPath = $mountPath;
         return $this;
     }
 

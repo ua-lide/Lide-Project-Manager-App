@@ -13,8 +13,26 @@ use Ratchet\ConnectionInterface;
 
 class UserManagerFactory
 {
-    public function create(ConnectionInterface $connection, string $projectPath)
+    /**
+     * @var string
+     */
+    private $jwtKeyPath;
+    private $baseProjectPath;
+
+
+    /**
+     * UserManagerFactory constructor.
+     * @param string $jwtKeyPath
+     * @param string $baseProjectPath
+     */
+    public function __construct(string $jwtKeyPath, string $baseProjectPath)
     {
-        return new UserManager($connection, $projectPath);
+        $this->jwtKeyPath = $jwtKeyPath;
+        $this->baseProjectPath = $baseProjectPath;
+    }
+
+    public function create(ConnectionInterface $connection)
+    {
+        return new UserManager($connection, $this->baseProjectPath, ".", $this->jwtKeyPath);
     }
 }

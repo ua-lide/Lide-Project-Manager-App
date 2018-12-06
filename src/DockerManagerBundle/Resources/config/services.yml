@@ -6,7 +6,7 @@ services:
       public: false
     docker_manager.user_manager_factory:
       class: DockerManagerBundle\WebSocketServer\UserManagerFactory
-      arguments: []
+      arguments: ['%jwt_key%', '%projects_folder%']
     docker_manager.websocket_server_command:
       class: DockerManagerBundle\Command\WebSocketServerCommand
       arguments: ["@logger", "%websocket_server_port%", "@docker_manager.user_manager_factory", "%projects_folder%"]

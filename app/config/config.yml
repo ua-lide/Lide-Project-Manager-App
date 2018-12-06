@@ -73,7 +73,7 @@ sensio_framework_extra:
    request: { converters: true }
 
 lexik_jwt_authentication:
-    public_key:       '%kernel.project_dir%/config/jwt/public.pem'  # required for token verification
+    public_key:       '%jwt_key%'  # required for token verification
 
 fos_rest:
     body_converter:

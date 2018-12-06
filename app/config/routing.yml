@@ -1,7 +1,3 @@
-lide_commons:
-    resource: "@LideCommonsBundle/Resources/config/routing.yml"
-    prefix:   /
-
 docker_manager:
     resource: "@DockerManagerBundle/Resources/config/routing.yml"
     prefix:   /

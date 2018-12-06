@@ -83,7 +83,7 @@ class WebSocketServerCommand extends ContainerAwareCommand
                 )
             ),
             $this->port,
-            "192.168.10.11" //TODO inject this
+            "192.168.50.5" //TODO inject this
         );
 
         //Set the timer to retrieve output of running dockers

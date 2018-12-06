@@ -30,6 +30,8 @@ class ExecuteMessageHandler implements MessageHandler
 
     public static $CompileOptionsKey = "compile_options";
     public static $LaunchOptionsKey = "launch_options";
+    public static $ImageOptionsKey = "image";
+
 
     public function __construct(string $dockerMemoryAllocation = "10M", int $dockerCpuAllocation = 1)
     {
@@ -54,8 +56,11 @@ class ExecuteMessageHandler implements MessageHandler
             }
         }
 
+        if (!array_key_exists(self::$ImageOptionsKey, $data) || !is_string($data[self::$ImageOptionsKey])) {
+            return false;
+        }
+        $image = $data[self::$ImageOptionsKey];
 
-        $image = $sender->getProjectsEnvironmentsDockerImage();
 
         if (is_null($image)) {
             return false;
@@ -63,18 +68,17 @@ class ExecuteMessageHandler implements MessageHandler
 
         $commandBuilder = DockerStartCommandBuilder::newInstance($image)
             ->withPseudoTty()
+            ->withBindMount($sender->getProjetAbsolutePath(), '/home/code')
             ->allocateMemory($this->dockerMemoryAllocation)
             ->allocateCpu($this->dockerCpuAllocation)
             ->withStartCommand($this->buildDockerEntryCommand($data));
 
         $started = $sender->startContainer($commandBuilder);
 
-        if ($started === false) {
-            $responseBuilder = new ResponseBuilder(ResponseBuilder::$STATUS);
-            $responseBuilder->addDataField('is_running', $sender->isContainerRunning());
+        $responseBuilder = new ResponseBuilder(ResponseBuilder::$STATUS);
+        $responseBuilder->addDataField('is_running', $sender->isContainerRunning());
 
-            $sender->sendJson($responseBuilder->buildArray());
-        }
+        $sender->sendJson($responseBuilder->buildArray());
 
         return true;
     }
@@ -86,6 +90,6 @@ class ExecuteMessageHandler implements MessageHandler
     protected function buildDockerEntryCommand(array $options) : string
     {
         //TODO real implementation
-        return "/bin/bash -c \"ping 8.8.8.8\"";
+        return "/bin/bash -c \"cd code/src && g++ main.cpp && ./a.out\"";
     }
 }

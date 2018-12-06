@@ -23,3 +23,6 @@ parameters:
 
     # The folder where user projects will be stored
     projects_folder: /home/vagrant/lide_storage
+
+    #JWT public key path
+    jwt_key: %kernel.project_dir%/config/jwt/public.pem
