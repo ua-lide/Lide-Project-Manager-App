@@ -108,7 +108,6 @@ class WebSocketServer implements MessageComponentInterface
         $userManager = $this->userManagerFactory->create($conn, ""); //TODO attach user entity
         /** @noinspection PhpUndefinedFieldInspection */
         $this->users[$conn->resourceId] = $userManager;
-
     }
 
     /**
@@ -148,7 +147,6 @@ class WebSocketServer implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
-
         echo "Message `$msg``\n";
         //Limit to 4 depth because message shouldn't have more
         $messageData = json_decode($msg, true, 4);
@@ -168,7 +166,7 @@ class WebSocketServer implements MessageComponentInterface
 
         $type = (string)$messageData['type'];
 
-        if(! $userManager->isAuthentificated() && $type != AuthentificationMessageHandler::$Type){
+        if (! $userManager->isAuthentificated() && $type != AuthentificationMessageHandler::$Type) {
             $from->send(json_encode([
                 'type' => 'error',
                 'data' => [ 'message' => 'Need to authenticate first' ]
@@ -184,7 +182,7 @@ class WebSocketServer implements MessageComponentInterface
 
         $ret = $handler->handle($userManager, $type, $messageData['data']);
         echo "Retour handler : $ret\n";
-        if($type === AuthentificationMessageHandler::$Type && !$ret){
+        if ($type === AuthentificationMessageHandler::$Type && !$ret) {
             $from->send(json_encode([
                 'type' => 'error',
                 'data' => [ 'message' => 'Auth error' ]
@@ -200,9 +198,8 @@ class WebSocketServer implements MessageComponentInterface
 
             /** @var ProcessManager $processManager */
             $processManager = $user->getProcessManager();
-            var_dump($processManager);
-            if($processManager != null){
-                try{
+            if ($processManager != null) {
+                try {
                     $out = $processManager->readOutput(1024);
                     $err = $processManager->readErrorOutput(1024);
 
@@ -212,11 +209,11 @@ class WebSocketServer implements MessageComponentInterface
                     $response = [];
 
                     $hasOut = false;
-                    if(!empty($out)){
+                    if (!empty($out)) {
                         $response['stdout'] = $out;
                         $hasOut = true;
                     }
-                    if(!empty($err)){
+                    if (!empty($err)) {
                         $response['stderr'] = $err;
                         $hasOut = true;
                     }
@@ -226,10 +223,10 @@ class WebSocketServer implements MessageComponentInterface
                     if ($hasOut) {
                         $user->getConnection()->send(json_encode(['type' => 'out', 'data' => $response], JSON_PRETTY_PRINT));
                     }
-                    if(!$running){
+                    if (!$running) {
                         $user->stopContainer();
                     }
-                }catch (ProcessStoppedException $e){
+                } catch (ProcessStoppedException $e) {
                     $user->stopContainer();
                 }
             }

@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\WebSocketServer\MessageHandlers;
 
-
 use DockerManagerBundle\Exceptions\WrongMessageTypeException;
 use DockerManagerBundle\WebSocketServer\MessageHandler;
 use DockerManagerBundle\WebSocketServer\UserManager;

@@ -56,6 +56,8 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
         if ($this->pseudoTty) {
             $builder->addRawArgument('-a stdout');
             $builder->addRawArgument('-a stderr');
+            $builder->addRawArgument('-a stdin');
+            $builder->addRawArgument('-i');
         }
 
         if (!is_null($this->cpuCount)) {

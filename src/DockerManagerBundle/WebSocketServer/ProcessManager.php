@@ -8,7 +8,6 @@
 
 namespace DockerManagerBundle\WebSocketServer;
 
-
 use DockerManagerBundle\Exceptions\ProcessAlreadyStartedException;
 use DockerManagerBundle\Exceptions\ProcessNotStartedException;
 use DockerManagerBundle\Exceptions\ProcessStoppedException;
@@ -59,7 +58,6 @@ class ProcessManager
      */
     public function start()
     {
-
         if ($this->started) {
             throw new ProcessAlreadyStartedException();
         }
