@@ -35,6 +35,10 @@ final class User implements JWTUserInterface
         );
     }
 
+    public function getId(){
+        return $this->id;
+    }
+
     /**
      * Returns the roles granted to the user.
      *

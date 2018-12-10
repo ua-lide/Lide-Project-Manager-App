@@ -6,18 +6,16 @@
  * Time: 14:54
  */
 
-namespace MainBundle\BashCommands\Docker;
+namespace DockerManagerBundle\BashCommands\Docker;
 
-use MainBundle\BashCommands\BashCommandBuilder;
+use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
 /**
  * Class DockerStopCommandBuilder
  * This class is a helper to build a docker stop command
- * @package MainBundle\Docker
  */
 class DockerStopCommandBuilder extends BashCommandBuilder
 {
-
     private $waitTimeSet = false;
 
     /**
@@ -42,7 +40,7 @@ class DockerStopCommandBuilder extends BashCommandBuilder
      */
     public function withWaitTime($seconds)
     {
-        if($this->waitTimeSet){
+        if ($this->waitTimeSet) {
             throw new \RuntimeException("Wait time already set");
         }
         $this->addFlagArgument('-t', $seconds);

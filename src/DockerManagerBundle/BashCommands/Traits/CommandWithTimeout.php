@@ -6,8 +6,7 @@
  * Time: 17:49
  */
 
-namespace MainBundle\BashCommands\Traits;
-
+namespace DockerManagerBundle\BashCommands\Traits;
 
 trait CommandWithTimeout
 {
@@ -22,7 +21,7 @@ trait CommandWithTimeout
 
     public function buildTimeoutPrefix()
     {
-        if(!is_null($this->timeoutTime)){
+        if (!is_null($this->timeoutTime)) {
             return "timeout --signal={$this->timeoutSignal} {$this->timeoutTime}";
         }
         return "";

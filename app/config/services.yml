@@ -29,7 +29,16 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    APIProjectBundle\DataFixtures\:
+        resource: '../../src/APIProjectBundle/DataFixtures/'
+
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
+# config/services.yaml
+    acme_api.event.jwt_created_listener:
+        class: AppBundle\Security\JWTCreatedListener
+        arguments: [ '@request_stack' ]
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }

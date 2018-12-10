@@ -6,10 +6,9 @@
  * Time: 14:55
  */
 
-namespace MainBundle\BashCommands\Docker;
+namespace DockerManagerBundle\BashCommands\Docker;
 
-
-use MainBundle\BashCommands\BashCommandBuilder;
+use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
 class DockerAttachCommandBuilder extends BashCommandBuilder
 {
@@ -28,8 +27,9 @@ class DockerAttachCommandBuilder extends BashCommandBuilder
         $this->containerIdentifier = $containerIdentifier;
     }
 
-    public function interactive(){
-        if($this->inputSet){
+    public function interactive()
+    {
+        if ($this->inputSet) {
             throw new \RuntimeException("Input mode already set");
         }
         $this->inputSet = true;
@@ -37,8 +37,9 @@ class DockerAttachCommandBuilder extends BashCommandBuilder
         return $this;
     }
 
-    public function notInteractive(){
-        if($this->inputSet){
+    public function notInteractive()
+    {
+        if ($this->inputSet) {
             throw new \RuntimeException("Input mode already set");
         }
         $this->inputSet = true;

@@ -6,11 +6,10 @@
  * Time: 14:54
  */
 
-namespace MainBundle\BashCommands\Docker;
+namespace DockerManagerBundle\BashCommands\Docker;
 
-
-use MainBundle\BashCommands\AbstractBashCommandBuilder;
-use MainBundle\BashCommands\BashCommandBuilder;
+use DockerManagerBundle\BashCommands\AbstractBashCommandBuilder;
+use DockerManagerBundle\BashCommands\BashCommandBuilder;
 
 class DockerStartCommandBuilder extends AbstractBashCommandBuilder
 {
@@ -23,6 +22,9 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
     private $dockerImageIdentifier;
     private $identifier;
     private $remove;
+    private $withBindMount = false;
+    private $hostPath;
+    private $mountPath;
 
     /**
      * DockerCommandBuilder constructor.
@@ -37,30 +39,41 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
     {
         $builder = new BashCommandBuilder('docker run');
 
-        if($this->remove){
+        if ($this->remove) {
             $builder->addRawArgument('--rm=true');
         }
-        if($this->identifier){
+        if ($this->identifier) {
             $builder->addFlagArgument('--name', $this->identifier);
         }
-        foreach ($this->addedHosts as $addedHost){
+        foreach ($this->addedHosts as $addedHost) {
             $builder->addFlagArgument('--add-host', $addedHost);
         }
 
-        if($this->inputFlag) $builder->addRawArgument('-i');
+        if ($this->inputFlag) {
+            $builder->addRawArgument('-a stdin');
+        }
 
-        if($this->pseudoTty) $builder->addRawArgument('-t');
+        if ($this->pseudoTty) {
+            $builder->addRawArgument('-a stdout');
+            $builder->addRawArgument('-a stderr');
+            $builder->addRawArgument('-a stdin');
+            $builder->addRawArgument('-i');
+        }
 
-        if(!is_null($this->cpuCount)){
+        if (!is_null($this->cpuCount)) {
             $builder->addFlagArgument('--cpus', $this->cpuCount);
         }
 
-        if(is_null($this->allocatedMemory)){
+        if (is_null($this->allocatedMemory)) {
             $builder->addFlagArgument('-m', $this->allocatedMemory);
         }
 
+        if ($this->withBindMount) {
+            $builder->addRawArgument('--mount type=bind,source=' . $this->hostPath . ',destination=' . $this->mountPath);
+        }
+
         $builder->addRawArgument($this->dockerImageIdentifier);
-        if($this->startCommand){
+        if ($this->startCommand) {
             $builder->addRawArgument($this->startCommand);
         }
 
@@ -84,6 +97,14 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
     public function withoutInput()
     {
         $this->inputFlag = false;
+        return $this;
+    }
+
+    public function withBindMount(string $hostPath, string $mountPath)
+    {
+        $this->withBindMount = true;
+        $this->hostPath = $hostPath;
+        $this->mountPath = $mountPath;
         return $this;
     }
 
@@ -133,7 +154,7 @@ class DockerStartCommandBuilder extends AbstractBashCommandBuilder
      */
     public function addHost($url, $ip = null)
     {
-        if(is_null($ip)){
+        if (is_null($ip)) {
             $this->addedHosts[] = $url;
         } else {
             $this->addedHosts[] = "{$url}:{$ip}";

@@ -16,6 +16,9 @@
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
         </testsuite>
+        <testsuite name="Docker Manager Manager Test Suite">
+            <directory>tests/DockerManagerBundle</directory>
+        </testsuite>
     </testsuites>
 
     <filter>

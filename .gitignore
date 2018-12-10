@@ -20,6 +20,11 @@ Homestead.yaml
 Homestead.json
 .vagrant
 Vagrantfile
+
+.php_cs.cache
+
+/config/jwt/public.pem
+
 *.log
 # User-specific stuff:
 .idea/**/workspace.xml
@@ -28,3 +33,4 @@ Vagrantfile
 .idea/deployment.xml
 .idea/dataSources*
 
+.php_cs.cache
