@@ -34,7 +34,16 @@ class InputMessageHandler implements MessageHandler
             return false;
         }
 
-        $sender->writeInput($input);
+        if ($sender->isContainerRunning()) {
+            $sender->writeInput($input);
+        } else {
+            $sender->sendJson([
+                'type' => 'error',
+                'date' => [
+                    'message' => 'No program is running'
+                ]
+            ]);
+        }
 
         return true;
     }

@@ -203,9 +203,6 @@ class WebSocketServer implements MessageComponentInterface
                     $out = $processManager->readOutput(1024);
                     $err = $processManager->readErrorOutput(1024);
 
-                    var_dump($out);
-                    var_dump($err);
-
                     $response = [];
 
                     $hasOut = false;

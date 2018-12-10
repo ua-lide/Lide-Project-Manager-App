@@ -90,6 +90,6 @@ class ExecuteMessageHandler implements MessageHandler
     protected function buildDockerEntryCommand(array $options) : string
     {
         //TODO real implementation
-        return "/bin/bash -c \"cd code/src && g++ main.cpp && ./a.out\"";
+        return "/bin/bash -c \"cd code/src && g++ main.cpp ${options[self::$CompileOptionsKey]} && ./a.out ${options[self::$LaunchOptionsKey]}\"";
     }
 }

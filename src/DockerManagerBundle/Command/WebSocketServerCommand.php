@@ -87,7 +87,7 @@ class WebSocketServerCommand extends ContainerAwareCommand
         );
 
         //Set the timer to retrieve output of running dockers
-        $server->loop->addPeriodicTimer(0.5, function () use ($wsServer) {
+        $server->loop->addPeriodicTimer(0.01, function () use ($wsServer) {
             $wsServer->retrieveDockerOutput();
         });
         $server->loop->futureTick(function () use ($output) {
