@@ -74,6 +74,12 @@ sensio_framework_extra:
 
 lexik_jwt_authentication:
     public_key:       '%jwt_key%'  # required for token verification
+    token_extractors:
+           # look for a token as Authorization Header
+           authorization_header:
+               enabled: true
+               prefix:  Bearer
+               name:    XX-LIDE-Authorization
 
 fos_rest:
     body_converter:
