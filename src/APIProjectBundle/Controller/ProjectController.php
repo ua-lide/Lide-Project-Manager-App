@@ -113,10 +113,6 @@ class ProjectController extends Controller
             );
         }
 
-        if (empty($projects)) {
-            return new JsonResponse(['message' => 'Projects not found'], Response::HTTP_NOT_FOUND);
-        }
-
         return $projects;
     }
 
