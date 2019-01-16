@@ -1,3 +1,10 @@
+docker_manager:
+    resource: "@DockerManagerBundle/Resources/config/routing.yml"
+    prefix:   /
+
 app:
     resource: '@AppBundle/Controller/'
     type: annotation
+api:
+    resource: '@APIProjectBundle/Controller/'
+    type: rest

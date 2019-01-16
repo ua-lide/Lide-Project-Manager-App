@@ -1,0 +1,3 @@
+[submodule "src/Lide"]
+	path = src/Lide
+	url = git@gitlab.com:ua-lide/lide-commons.git
